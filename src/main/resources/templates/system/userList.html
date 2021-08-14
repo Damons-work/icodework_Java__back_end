@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" method="post">
+      <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">所在商户：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="user.partner.partnerName" value="${isEmpty(user.partner)?'':user.partner.partnerName}" class="layui-input" style="width:158px" onclick="selectPartner();" readonly="true"/>
+						<input type="hidden" name="user.partnerId" value="${user.partnerId}"/>
+					</div>
+                </div>
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">电子信箱：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="user.email" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(user.email)}"
+								class="layui-input" style="width:158px" maxlength="25" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">账户名称：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="user.userName" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(user.userName)}"
+								class="layui-input" style="width:158px" maxlength="25" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+                
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">有效标识：</label>
+                    <div class="layui-input-inline">
+						<input type="radio" name="user.activeFlag" value="true" title="有效"<% if(user.activeFlag != null && user.activeFlag) {%> checked<%}%>/>
+						<input type="radio" name="user.activeFlag" value="false" title="禁用"<% if(user.activeFlag == null || !user.activeFlag) {%> checked<%}%>/>
+					</div>
+                </div>
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+	                <#canVisit uri="/system/userAdd.do">
+	                <a class="layui-btn layui-btn-warm" onclick="doAdd('系统账户', 'user', 1000, 800);">新增</a>
+	                </#canVisit>
+                </div>
+            </div>
+            <table class="layui-table">
+             <thead>
+             <tr>
+                <th width="30" class="center">序号</th>
+                <th>所属商户</th>
+                <th>电子信箱</th>
+                <th>账户名称</th>
+                <th width="100">是否有效</th>
+                <th width="100" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(userList) && userList != null && !isEmpty(userList)){ for(i in userList) {%>
+                <tr>
+                    <td><a href="javascript:doView('系统账户', 'user', 1000, 800, '${i.id}');" style="color:#01AAED;">${i.id}</a></td>
+                    <td>${isEmpty(i.partner)?'运营商':i.partner.partnerName}</td>
+                    <td>${i.email}</td>
+                    <td>${i.userName}</td>
+				  <td>
+					<% if(i.activeFlag != null && i.activeFlag) {%>有效<%}%>
+					<% if(i.activeFlag != null && !i.activeFlag) {%>禁用<%}%>
+				  </td>
+	                <td>         
+	                <#canVisit uri="/system/userUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;"onclick="doUpdate('系统账户', 'user', 1000, 800, '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/system/userDelete.do">
+	                    <i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('系统账户', 'user', '${i.id}');"></i>
+	                </#canVisit>
+	                <%if (isPlatformAdmin) {%>
+	                <#canVisit uri="/system/userUpdate.do">
+                        <i class="layui-icon layui-icon-app" title="直接权限" style="cursor:pointer;font-size:20px;color:#2F4056;margin:5px;" onclick="configPermission('${i.id}');"></i>
+	                </#canVisit>
+	                <%}%>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+    
+    // 选择所属商户
+    function selectPartner() {
+        openDialog("商户选择", "../basis/partnerSelect.do", 1000, 800, function(result) {
+   			console.log(result);
+   			var arr = result.data;
+   			if(arr == null || arr.length == 0) {
+                // 清除
+                document.forms[0]["user.partner.partnerName"].value = "";
+                document.forms[0]["user.partnerId"].value = "";
+   				return;
+   			}
+
+            var partners = result.data;
+            // 获得商户编号和商户名称
+            document.forms[0]["user.partner.partnerName"].value = partners[0].partnerName;
+            document.forms[0]["user.partnerId"].value = partners[0].id;
+        });
+    }
+	
+    // 选择所在组织
+    function selectOrganization() {
+        openDialog("组织机构选择", "../basis/organizationSelect.do", 1000, 600, function(result) {
+            if(result == null || result.data == null) {
+                // 清除
+                document.forms[0]["user.organization.organizationName"].value = "";
+                document.forms[0]["user.organizationId"].value = "";
+				return;
+			}
+
+			var org = result.data[0];
+			// 获得组织机构编号和名称
+			document.forms[0]["user.organization.organizationName"].value = org.organizationName;
+            document.forms[0]["user.organizationId"].value = org.id;
+        });
+    }
+
+    function configPermission(userId) {
+        openDialog("账户直接权限设定", "../system/userMenuUpdate.do?userId=" + userId, 1000, 800);
+    }
+</script>
+</html>

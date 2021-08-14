@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>上传示例</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../layuiadmin/style/admin.css" media="all">  <script>
+  	// 获取根域名
+	var arr = location.hostname.split('.');
+	while(arr.length > 2) {
+		arr = arr.slice(1);
+		try {
+			// 设置根域名为document.domain
+			document.domain = arr.join('.');
+		} catch (e) {}
+	}
+  </script>
+  <script language="javascript" src="../js/jquery-3.3.1.min.js"></script>
+  <script language="javascript" src="../layuiadmin/layui/layui.js"></script>  
+  <script language="javascript" src="../js/jquery-icode.js"></script>
+</head>
+<body>
+<div class="layui-fluid">
+	<form id="fView" class="layui-form" onsubmit="return false" action="##">
+	上传图片
+         <div class="layui-upload-drag" id="uploadDiv1">
+            <i class="layui-icon"></i>
+            <p>点击上传文件，或将文件拖拽到此处</p>
+         </div>
+        
+        <hr/>
+         
+	上传文件
+         <div class="layui-upload-drag" id="uploadDiv2">
+            <i class="layui-icon"></i>
+            <p>点击上传文件，或将文件拖拽到此处</p>
+         </div>
+	</form>
+</div>
+</body>
+<script>
+	layui.use('upload', function(){
+		var upload = layui.upload;
+
+		// 上传图片
+		upload.render({
+			elem: '#uploadDiv1',
+			url: '../common/upload',
+			done: function(res){
+				if(res == null || res.statusCode != 200) {
+					return;
+				}
+				
+				// 返回上传后的文件地址
+				var url = res.data;
+				
+				// 使用上传后的文件地址
+				// 显示上传的文件
+				if(url.indexOf("http://") == 0 || url.indexOf("https://") == 0) {
+					$(this.elem).after('<div><a href="' + url + '" target="_blank">点击下载</a> &nbsp; <a class="layui-btn layui-btn-xs demo-reload deletexs">删除</a></div>');	
+				} else {
+					$(this.elem).after('<div><a href="../common/download?file=' + url + '" target="_blank">点击下载</a> &nbsp; <a class="layui-btn layui-btn-xs demo-reload deletexs">删除</a></div>');	
+				}
+				
+				// 隐藏上传对话框
+				$(this.elem).css('display', 'none');			
+
+				alert("上传后的文件地址是：\n" + url);
+			}
+		});
+		
+
+		// 上传文件
+		// accept：指定允许上传时校验的文件类型，可选值有：images（图片）、file（所有文件）、video（视频）、audio（音频）
+		upload.render({
+			elem: '#uploadDiv2',
+			url: '../common/upload',
+			accept: 'file',
+			done: function(res){
+				if(res == null || res.statusCode != 200) {
+					return;
+				}
+				
+				// 返回上传后的文件地址
+				var url = res.data;
+				// 显示上传的文件
+				if(url.indexOf("http://") == 0 || url.indexOf("https://") == 0) {
+					$(this.elem).after('<div><a href="' + url + '" target="_blank">点击下载</a> &nbsp; <a class="layui-btn layui-btn-xs demo-reload deletexs">删除</a></div>');	
+				} else {
+					$(this.elem).after('<div><a href="../common/download?file=' + url + '" target="_blank">点击下载</a> &nbsp; <a class="layui-btn layui-btn-xs demo-reload deletexs">删除</a></div>');	
+				}
+				
+				// 隐藏上传对话框
+				$(this.elem).css('display', 'none');
+			}
+		});
+	});
+	
+	// 设置删除按钮触发
+	$(document).on("click",".deletexs",function(){
+		// 显示当前父节点的前面元素
+		$(this).parent().prev().css('display', '');
+		$(this).parent().remove();
+	});
+</script>
+</html>

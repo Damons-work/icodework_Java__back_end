@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.system.mapper.RoleMapper">
+    <!-- 查询角色信息 -->
+    <!-- 查询单条角色信息 -->
+    <select id="getObject" resultType="cn.js.icode.system.data.Role">
+        SELECT
+        RoleId, RoleName, TypeFlag, Remark, UserCount, WelcomePage
+        FROM system_role_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    RoleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.roleName != null and where.roleName != ''">
+                        AND RoleName = #{where.roleName}
+                    </if>
+	
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+	
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark = #{where.remark}
+                    </if>
+	
+                    <if test="where != null and where.userCount != null">
+                        AND UserCount = #{where.userCount}
+                    </if>
+	
+                    <if test="where != null and where.welcomePage != null and where.welcomePage != ''">
+                        AND WelcomePage = #{where.welcomePage}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY RoleId DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条角色信息 -->
+    <select id="list" resultType="cn.js.icode.system.data.Role">
+        SELECT
+        RoleId, RoleName, TypeFlag, Remark, UserCount, WelcomePage
+        FROM system_role_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    RoleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.roleName != null and where.roleName != ''">
+                        AND RoleName like concat('%', #{where.roleName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+	
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark like concat('%', #{where.remark}, '%')
+                    </if>
+	
+                    <if test="where != null and where.userCount != null">
+                        AND UserCount = #{where.userCount}
+                    </if>
+	
+                    <if test="where != null and where.welcomePage != null and where.welcomePage != ''">
+                        AND WelcomePage like concat('%', #{where.welcomePage}, '%')
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY RoleId DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM system_role_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    RoleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.roleName != null and where.roleName != ''">
+                        AND RoleName like concat('%', #{where.roleName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+	
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark like concat('%', #{where.remark}, '%')
+                    </if>
+	
+                    <if test="where != null and where.userCount != null">
+                        AND UserCount = #{where.userCount}
+                    </if>
+	
+                    <if test="where != null and where.welcomePage != null and where.welcomePage != ''">
+                        AND WelcomePage like concat('%', #{where.welcomePage}, '%')
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO system_role_base(RoleId, RoleName, TypeFlag, Remark, UserCount, WelcomePage, UpdateTime)
+        VALUES (
+        #{data.id}, 
+
+		#{data.roleName}, 
+	
+		#{data.typeFlag}, 
+	
+		#{data.remark}, 
+	
+		#{data.userCount}, 
+	
+		#{data.welcomePage},
+		now()
+	
+        )
+    </insert>
+
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE system_role_base
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                RoleId = #{data.id},
+            </if>
+		
+			<if test="data.roleName != null">
+				RoleName = #{data.roleName},
+			</if>
+	
+			<if test="data.typeFlag != null">
+				TypeFlag = #{data.typeFlag},
+			</if>
+	
+			<if test="data.remark != null">
+				Remark = #{data.remark},
+			</if>
+	
+			<if test="data.userCount != null">
+				UserCount = #{data.userCount},
+			</if>
+	
+			<if test="data.welcomePage != null">
+				WelcomePage = #{data.welcomePage},
+			</if>
+	
+			UpdateTime = now()
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    RoleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.roleName != null">
+                        AND RoleName = #{where.roleName}
+                    </if>
+	
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+	
+                    <if test="where != null and where.remark != null">
+                        AND Remark = #{where.remark}
+                    </if>
+	
+                    <if test="where != null and where.userCount != null">
+                        AND UserCount = #{where.userCount}
+                    </if>
+	
+                    <if test="where != null and where.welcomePage != null">
+                        AND WelcomePage = #{where.welcomePage}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除角色信息 -->
+    <delete id="delete">
+        DELETE FROM system_role_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    RoleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.roleName != null">
+                        AND RoleName = #{where.roleName}
+                    </if>
+	
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+	
+                    <if test="where != null and where.remark != null">
+                        AND Remark = #{where.remark}
+                    </if>
+	
+                    <if test="where != null and where.userCount != null">
+                        AND UserCount = #{where.userCount}
+                    </if>
+	
+                    <if test="where != null and where.welcomePage != null">
+                        AND WelcomePage = #{where.welcomePage}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

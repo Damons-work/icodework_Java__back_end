@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    
+    include("/static/include/css.html"){}
+
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" action="warningConfigList.do" method="post" onsubmit="return false">
+      <div class="layui-card">
+        <div class="layui-card-body">
+
+            <div class="layui-form-item">
+	
+		  		<!--<div class="layui-inline">
+                    <label class="layui-form-label" style="width: 120px">数据库序号：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="warningConfig.dbAlias" value="${warningConfig.dbAlias}" class="layui-input" style="width:150px" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+
+		  		<div class="layui-inline">
+                    <label class="layui-form-label" style="width: 120px">提醒信息：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="warningConfig.tip" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(warningConfig.tip)}"
+								class="layui-input" style="width:150px" maxlength="50" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+
+		  		<div class="layui-inline">
+                    <label class="layui-form-label" style="width: 120px">菜单项编号：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="warningConfig.menuId" value="${warningConfig.menuId}" class="layui-input" style="width:150px" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+
+		  		<div class="layui-inline">
+                    <label class="layui-form-label" style="width: 120px">查询语句：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="warningConfig.querySql" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(warningConfig.querySql)}"
+								class="layui-input" style="width:150px" maxlength="500" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div> -->
+		  
+                <div class="layui-inline">
+	                <!-- <a class="layui-btn layui-btn-normal" style="margin-left: 50px" onclick="submitForm();">查询</a>-->
+	                <#canVisit uri="/system/warningConfigAdd.do">
+	                <a class="layui-btn layui-btn-warm" onclick="doAdd('告警配置', 'warningConfig', 750, 600);">新增</a>
+	                </#canVisit>
+                </div>
+            </div>
+
+            <table class="layui-table">
+             <thead>
+             <tr>
+                <th width="30" class="center">序号</th>
+	
+		  <th width="100">数据库配置</th>
+		  
+		  <th width="140">提醒信息格式</th>
+		  
+		  <th width="80">关联菜单</th>
+		  
+		  <th>统计查询的SQL语句</th>
+		  
+                <th width="80" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(warningConfigList) && warningConfigList != null && !isEmpty(warningConfigList)){ for(i in warningConfigList) {%>
+                <tr>
+	                <td><a href="javascript:doView('告警配置', 'warningConfig', 750, 600, '${i.id}');" style="color:#01AAED;">${i.id}</a></td>
+			
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.dbAlias)}</td>
+				  
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.tip)}</td>
+				  
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.menu.menuName!)}</td>
+				  
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.querySql)}</td>
+				  
+	                <td>
+	                <#canVisit uri="/system/warningConfigUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('告警配置', 'warningConfig', 750, 600, '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/system/warningConfigDelete.do">
+	                    <i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('告警配置', 'warningConfig', '${i.id}');"></i>
+	                </#canVisit>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>    
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+
+    });
+</script>
+</html>

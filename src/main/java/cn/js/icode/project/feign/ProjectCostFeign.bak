@@ -1,0 +1,33 @@
+package cn.js.icode.project.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+
+import team.bangbang.spring.microservice.IFeign;
+import cn.js.icode.project.entity.ProjectCost;
+
+/**
+ * 项目成本 - FeignClient
+ * 对应微服务：cn.js.icode.project.micro.ProjectCostMicro
+ *
+ * 使用时请按照以下2步执行：
+ * <pre>
+ * 1. 将FeignClien注解的value值替换为微服务提供者的工程名称；
+ *    即提供者工程application.properties中的spring.application.name配置
+ *    注意工程名称不能含有下划线，但可以使用减号
+ *
+ * 2. 提取本类及相关的POJO文件并放入调用者工程中，别的类及文件不需要带入。具体为：
+ *    cn.js.icode.project.entity.ProjectCost
+ *    cn.js.icode.project.feign.ProjectCostFeign
+ * </pre>
+ *
+ * @author Bangbang
+ * @version 1.0  2021-07-15
+ */
+@FeignClient(value="[TODO:此处要填入固定值，不可引用配置]", path="/project/projectCost")
+public interface ProjectCostFeign extends IFeign<ProjectCost> {
+	/**************************************************************************
+	 * ！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！
+	 * －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+	 *
+	 *************************************************************************/
+}

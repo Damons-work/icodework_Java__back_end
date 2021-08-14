@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+	<form id="fView" class="layui-form" onsubmit="return false" action="##">
+		<input type="hidden" id="dialogId" name="dialogId" value="${dialogId}"/>
+  		<div class="layui-card">
+			<!-- 如需要header信息，放开下面的comment -->
+			<!-- <div class="layui-card-header">基础信息</div> -->
+			<div class="layui-card-body" style="padding: 15px;">
+				<!-- 如一行显示多列数据，参照下面的示例 -->
+				<!--
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">属性1：</label>
+						<div class="layui-input-inline">属性1对应数值</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">属性2：</label>
+						<div class="layui-input-inline">属性1对应数值</div>
+					</div>
+				</div>
+				-->
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">所属模块：</label>
+						<div class="layui-input-inline layui-form-mid">${parameter.module}</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">参数名称：</label>
+						<div class="layui-input-inline layui-form-mid">${parameter.parameterName}</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">参数数值：</label>
+					<div class="layui-input-block layui-form-mid">${parameter.parameterValue}</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">参数说明：</label>
+					<div class="layui-input-block layui-form-mid">${parameter.remark}</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+</body>
+<script>
+	layui.use(['form'], function(){
+        var form  = layui.form;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+</script>
+</html>

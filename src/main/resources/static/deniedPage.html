@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <title></title>
+<body>
+<h1>无权限访问本页面<span id="spUrl"></span></h1>
+</body>
+<script>
+var h = location.hash;
+if(h != null && h != "") {
+	h = h.substr(1);
+}
+
+if(h != null && h != "") {
+	document.getElementById("spUrl").innerHTML = "（" + h + "）"
+}
+</script>
+</html>

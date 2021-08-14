@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+
+<div class="layui-fluid layadmin-maillist-fluid">
+  <div class="layui-row layui-col-space15">
+<% if(has(authorizerGrantList) && authorizerGrantList != null){ for(i in authorizerGrantList) {%>
+    <div class="layui-col-md4 layui-col-sm6">
+      <div class="layadmin-contact-box" > 
+          <div class="layui-col-md4 layui-col-sm6">
+            <a href="javascript:;">
+              <div class="layadmin-text-center">
+                <img src="${i.headImage}" width="120" height="120" border="0"/>
+              </div>
+            </a>
+          </div>
+        
+        <div class="layui-col-md8 layadmin-padding-left20 layui-col-sm6">
+          <a href="javascript:;">
+            <h3 class="layadmin-title">
+              <strong>编号：${i.id}</strong>
+            </h3>
+            <hr/>
+            <p class="layadmin-textimg">
+              <i class="layui-icon layui-icon-login-wechat"></i>
+              ${i.authorizerName}
+            </p>
+          </a>
+          <div class="layadmin-address">
+            <a href="javascript:;">
+              <i class="layui-icon layui-icon-log"></i>
+              ${i.grantTime, dateFormat="yyyy-MM-dd HH:mm"}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+<%}}%>
+
+    <div class="layui-col-md4 layui-col-sm6">
+      <div class="layadmin-contact-box" onclick="location.href = getFullUrl('../weixin/beforeGrant.do');">
+		<i class="layui-icon layui-icon-add-circle"></i> 新增
+      </div>
+    </div>
+  </div>
+</div>
+  <script src="../layuiadmin/layui/layui.js"></script>  
+  <script>
+  layui.config({
+    base: '../layuiadmin/' // 静态资源所在路径
+  }).extend({
+    index: 'lib/index' // 主入口模块
+  }).use(['layer'], function(){
+	var layer = layui.layer;
+  });
+  
+  function unbind(grantId) {
+	  $.confirm("解除绑定 " + grantId + "？", function() {
+		  $.alert("确定");
+	  }, function() {
+		  $.alert("取消");
+	  });
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+	<form id="fAdd" class="layui-form" action="#" onsubmit="return false" method="post">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+
+		<div class="layui-card">
+			<!-- 如需要header信息，放开下面的comment -->
+			<div class="layui-card-header">基础信息</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<!-- 如一行显示多列数据，参照下面的示例 -->
+				<!-- 
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">属性1：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">属性2：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>
+				</div>
+				-->
+
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">申请单<span style="color:#FF5722;">*</span>：</label>
+						<div class="layui-input-inline">
+							<select name="audit.bizCode">
+								<option value="">--请选择--</option>
+								<% if(has(bizList) && bizList != null) { for(i in bizList) {%>
+								<option value="${i.itemCode}"<% if(audit.bizCode == i.itemCode) {%> selected<%}%>>${i.itemName}</option>
+								<%}}%>
+							</select>
+						</div>
+					</div>
+	  
+					<div class="layui-inline">
+						<label class="layui-form-label">有效标识<span style="color:#FF5722;">*</span>：</label>
+						<div class="layui-input-inline">
+							<input type="radio" name="audit.activeFlag" value="true" title="有效"<% if(audit.activeFlag != null && audit.activeFlag) {%> checked<%}%>/>
+							<input type="radio" name="audit.activeFlag" value="false" title="禁用"<% if(audit.activeFlag == null || !audit.activeFlag) {%> checked<%}%>/>
+						</div>
+					</div>
+				</div>
+	  
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">适用组织：</label>
+						<div class="layui-input-inline">
+						    <input type="text" name="audit.organization.organizationName" placeholder="选择适用组织" value="${isEmpty(audit.organization)?'':audit.organization.organizationName}" autocomplete="off" class="layui-input" readonly="true" onclick="selectOrganization();"/>
+							<input type="hidden" name="audit.organizationId" value="${audit.organizationId}">
+						</div>
+					</div>
+	  
+					<div class="layui-inline">
+						<label class="layui-form-label">申请人：</label>
+						<div class="layui-input-inline">
+							<input type="text" id="audit.user.userName" name="audit.user.userName" placeholder="选择申请人" value="${isEmpty(audit.user)?'':audit.user.userName}" autocomplete="off" class="layui-input" readonly="true" onclick="selectUser(this);"/>
+							<input type="hidden" id="audit.userId"  name="audit.userId" value="${audit.userId}">
+							<input type="hidden" name="audit.itemCount" value="${audit.itemCount}">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-card">
+			<div class="layui-card-header">审批环节</div>
+			<div class="layui-card-body" style="padding: 15px;">	  
+
+				<table class="layui-table" id="dynamicTable">
+					<thead>
+						<tr>
+							<th width="30" align="center">序号</th>
+							<th>审批角色、人员</th>
+							<th width="80" align="center">审批方式</th>
+							<th width="90" align="center">驳回是否继续</th>
+							<th width="70" align="center">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<button class="layui-btn layui-btn-xs layui-btn-warm" onclick="addRow(document.getElementById('dynamicTable'));">
+					<i class="layui-icon layui-icon-add-1"></i>
+					添加一个环节
+				</button>
+				
+			</div>
+		</div>
+		
+		<div class="layui-form-item layui-layout-admin">
+			<div class="layui-input-block">
+				<div class="layui-footer" style="left: 0;">
+					<button class="layui-btn" onclick="doAddAction('audit');">新 增</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+
+    });
+
+	function validate(theForm) {
+		// 注意：
+		// 如果更改页面表单的控件类型，请在校验判断时做对应修改：
+		// 1. 下拉框：使用 $.trim(theForm["控件名称"].value) == ""
+		// 2. 单选框/复选框：使用 getChoiceValue("控件名称") == null
+		// 
+	
+		var auditBizCode = $.trim(theForm["audit.bizCode"].value);
+		if(auditBizCode == "") {
+			$.message("请选择申请单！");
+			return false;
+		}
+	
+		if(getChoiceValue("audit.activeFlag") == null) {
+			$.message("请选择有效标识！");
+			return false;
+		}
+	
+		var auditItemCount = $.trim(theForm["audit.itemCount"].value);
+	
+		if(auditItemCount == "") {
+			$.message("请设置审批环节！");
+			return false;
+		}
+		
+		// 检查所有的环节输入框
+		var iChoiceRole = theForm["choiceRoleId"];
+		var iChoiceUser = theForm["choiceIds"];
+		if(auditItemCount == 1) {
+			// 只有一行
+			var v_a = $.trim(iChoiceRole.value);
+			var v_b = $.trim(iChoiceUser.value);
+			if(v_a == "-" && v_b == "-") {
+				$.message("每个审批环节必须选择审批角色或者审批人员！");
+				return false;
+			}
+			
+			return true;
+		} else {	
+			// 多行
+			for(var i = 0; i < iChoiceRole.length; i++) {
+				var iVl_a = $.trim(iChoiceRole[i].value);
+				var iVl_b = $.trim(iChoiceUser[i].value);
+				if(iVl_a == "-" && iVl_b == "-") {
+					$.message("每个审批环节必须选择审批角色或者审批人员！");
+					return false;
+				}
+			}
+		}
+	
+		return true;
+	}
+	
+	var nLineIndex = 1;
+    // 审批角色下拉框的option
+    var optRole = '<option value="-">--请选择--</option>' +
+        <% if(has(roleList) && roleList != null){ for(i in roleList) {%>
+        '<option value=\'${i.id}\'>${i.roleName}</option>' +
+        <%}}%>
+    	'';
+	
+    // 审批方式下拉框的option
+    var optAttend = '' +
+        <% if(has(attendList) && attendList != null){ for(i in attendList) {%>
+        '<option value=\'${i.key}\'>${i.value}</option>' +
+        <%}}%>
+    	'';
+    	
+   	function addRow(tableID, lineSelected) {
+   		var newRow = null;
+   		if(lineSelected != null && lineSelected.rowIndex >= 0) {
+   			newRow = tableID.insertRow(lineSelected.rowIndex+1);
+   		} else {
+   			newRow = tableID.insertRow(-1);
+   		}
+   		
+   		nLineIndex++;
+   		
+   		newRow.id = 'line' + nLineIndex;
+   		newRow.align = 'center';
+
+   		td1 = document.createElement("td");
+   		td2 = document.createElement("td");
+   		td3 = document.createElement("td");
+   		td4 = document.createElement("td");
+   		td5 = document.createElement("td");
+   		
+   		// 表格行数
+   		var lineCount = tableID.rows.length;
+   		// 编号	  
+   		// 审批人员
+   		td2.innerHTML = '<select name="choiceRoleId" id="choiceRoleId_' + nLineIndex + '" onChange="selectRole(this);" style="width:100px;height:40px;" lay-ignore>' + optRole + '</select> <input type="text" name="choiceNames" id="choiceNames_' + nLineIndex + '" style="width:170px;height:36px;" maxlength="250" readonly onclick="selectUser(this);" placeholder="选择系统账户" lay-ignore><input type="hidden" name="choiceIds" id="choiceIds_' + nLineIndex + '"value="-"/>';
+   		// 审批方式
+   		td3.innerHTML = '<select name="attendFlag" style="width:70px;height:40px;" lay-ignore>' + optAttend + '</select>';
+   		// 驳回是否继续
+   		td4.innerHTML = '<input type="radio" name="cf_' + nLineIndex + '" value="true" onclick="changeContinueFlag(this);" lay-ignore>是 &nbsp; <input type="radio" name="cf_' + nLineIndex + '" value="false" checked onclick="changeContinueFlag(this);" lay-ignore>否<input type="hidden" name="continueFlag" id="continueFlag_' + nLineIndex + '" value="false"/>';
+   		// 操作
+   		td5.innerHTML = '<i class="layui-icon layui-icon-add-1" title="在下面添加一行" style=\'cursor:pointer;font-size:20px;color:#FFB800;margin:5px;\' onclick=\'addRow(document.getElementById(\"dynamicTable\"), document.getElementById(\"' + newRow.id + '\"));\'></i>' +
+			'<i class=\'layui-icon layui-icon-delete\' title="删除" onclick=\'deleteRow(document.getElementById(\"dynamicTable\"), document.getElementById(\"' + newRow.id + '\"));\' style=\'cursor:pointer;font-size:20px;color:#01AAED;margin:5px;\'></i>';
+
+   		newRow.appendChild(td1);
+   		newRow.appendChild(td2);
+   		newRow.appendChild(td3);
+   		newRow.appendChild(td4);
+   		newRow.appendChild(td5);
+   		
+   		// 梳理表信息字段序号
+   		fillNo(tableID);
+   	}
+
+   	function deleteRow(tbl, lineField) {
+   		
+   		if(confirm('你确定删除该行？')) {
+   			tbl.deleteRow(lineField.rowIndex);
+   			// 梳理表信息字段序号
+   			fillNo(tbl);
+   		}
+   	}
+
+   	// 梳理表信息字段序号
+   	function fillNo(tbl) {
+   		var lineCount = tbl.rows.length;
+   		for(var i = 1; i < lineCount; i++) {
+   			var tempCell = tbl.rows[i].cells[0];
+   			tempCell.innerHTML = i + "";
+   		}
+   		
+   		document.forms[0]["audit.itemCount"].value = lineCount - 1;
+   		
+   	    if(layui.form != null) {
+   	        layui.form.render();
+   	    }
+   	}
+   	
+   	function selectOrganization() {
+   		openDialog("组织机构选择", "../basis/organizationSelect.do", 1000, 600, function(result){
+   			console.log(result);
+   			var arr = result.data;
+   			if(arr == null || arr.length == 0) {
+   				// 清除
+   				document.forms[0]["audit.organization.organizationName"].value = "";
+   				document.forms[0]["audit.organizationId"].value = "";
+   				return;
+   			}
+   			
+   			var org = arr[0];
+			document.forms[0]["audit.organization.organizationName"].value = org.organizationName;
+			document.forms[0]["audit.organizationId"].value = org.id;
+   		});
+   	}
+
+   	function selectRole(nameEle) {
+   		var nameId = nameEle.id;
+   		
+   		rowIndex = nameId.replace("choiceRoleId_", "") * 1;
+   		// 清楚当前行的审批人员名称串和编号串
+   		document.getElementById("choiceNames_" + rowIndex).value = "";
+   		document.getElementById("choiceIds_" + rowIndex).value = "-";
+   	}
+
+   	function changeContinueFlag(ele) {
+   		var bl = ele.value;
+   		// cf_0 --> continueFlag_0
+   		var cf = ele.name.replace("cf_", "continueFlag_");
+   		document.getElementById(cf).value = bl;
+   	}
+   	
+   	// 在第几行选择角色或者用户？
+   	var rowIndex = -1;
+   	function selectUser(nameEle) {
+   		var nameId = nameEle.id;
+   		var idId = null;
+   		
+   		var m = false;
+   		if(nameId == "audit.user.userName") {
+   			// 选择申请人
+   			idId = "audit.userId";   			
+   			rowIndex = -1;
+   			
+   			// 单选
+   			m = false;
+   		} else if(nameId.indexOf("choiceNames_") == 0) {
+   			// 选择审批人员
+   			idId = nameId.replace("choiceNames_", "choiceIds_");   			
+   			rowIndex = nameId.replace("choiceNames_", "") * 1;
+   			
+   			// 多选
+   			m = true;
+   		}
+   		
+   		// 访问地址
+   		openDialog('系统账户选择', "../system/userSelect.do?multiple=" + m, 800, 600, function(result){
+   			console.log(result);
+   			var arr = result.data;
+   			if(arr == null || arr.length == 0) {
+   				// 清除
+   				document.getElementById(idId).value = "-";
+   				document.getElementById(nameId).value = "";
+   				return;
+   			}
+   			
+   			var sId = '';
+   			var sName = '';
+   			for(var i = 0; i < arr.length; i++) {
+   				if(i > 0) {
+   					sId += ',';
+   					sName += '，';
+   				}
+   				sId += arr[i].id;
+   				sName += arr[i].userName;
+   			}
+   			
+   			if(m) {
+   				// 多选采用追加方式
+   				if(document.getElementById(idId).value.length > 0) sId = document.getElementById(idId).value + "," + sId;
+   				if(document.getElementById(nameId).value.length > 0) sName = document.getElementById(nameId).value + "," + sName;
+   				
+   	   			document.getElementById(idId).value = sId;
+   	   			document.getElementById(nameId).value = sName;
+   			} else {
+   				// 单选采用替换方式
+   	   			document.getElementById(idId).value = sId;
+   	   			document.getElementById(nameId).value = sName;
+   			}
+   			
+   			// 选择了用户，且选择的用户用于填充“审批人员”
+   			if(rowIndex >= 0) {
+   				// 角色下拉框选择空
+   				document.getElementById("choiceRoleId_" + rowIndex).selectedIndex = 0;
+   			}
+   		});
+   	}
+</script>
+</body>
+</html>

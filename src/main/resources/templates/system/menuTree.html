@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+	<style type="text/css">
+		#menu {
+			position: fixed;
+			left: 0;
+			top: 0;
+			width: 100px;
+			display: none;
+			border: 1px solid Black;
+			background: #F5F5F5;
+		}
+
+		.item {
+			padding-left: 18%;
+			color: #8D8D8D;
+		}
+
+		.itemHr {
+			margin-left: 15%;
+		}
+
+		.itemTitle {
+			padding: 5px;
+			font-size: 16px;
+			color: #8D8D8D;
+			background: #dddddd;
+			border-bottom: 1px solid #c2c2c2;
+			margin-bottom: 10px;
+		}
+	</style>
+	<script>
+        //右键菜单
+        document.oncontextmenu = function (e) {
+            if(selectedNode == null) {
+                return false;
+            }
+
+            var e = e || window.event;
+            //鼠标点的坐标
+            var oX = e.clientX;
+            var oY = e.clientY;
+            //菜单出现后的位置
+            document.getElementById("menu").style.display = "block";
+            document.getElementById("menu").style.left = oX + "px";
+            document.getElementById("menu").style.top = oY + "px";
+            //阻止浏览器默认事件
+            return false;//一般点击右键会出现浏览器默认的右键菜单，写了这句代码就可以阻止该默认事件。
+        }
+
+        document.onclick = function (e) {
+            var e = e || window.event;
+            document.getElementById("menu").style.display = "none"
+        }
+
+        function cancelBubble(e) {
+            var e = e || window.event;
+            e.cancelBubble = true;
+        }
+
+        // 当前选择的节点
+        var selectedNode = null;
+
+        function itemMouseover(id) {
+            // 选择的节点id
+			var selectedId = (selectedNode == null ? null : selectedNode.id);
+			console.log("selectedNode:");
+			console.log(selectedNode);
+
+            var item = document.getElementById(id);
+            item.style.backgroundColor = "#2F4056"
+            item.onclick = function () {
+                // 隐藏当前的右键菜单
+                document.getElementById("menu").style.display = "none";
+
+                if (id == "Add") {
+                    doAdd('菜单', 'menu', 1000, 800, selectedId);
+                } else if (id == "Update") {
+                    doUpdate('菜单', 'menu', 1000, 800, selectedId, function() {loadTree(document.getElementById("menu.id").value);});
+                } else if(id == "Delete") {
+                    doDelete('菜单', 'menu', selectedId);
+                    selectedNode = null;
+                }
+            }
+        }
+        function itemMouseout(id) {
+            var item = document.getElementById(id);
+            item.style.backgroundColor = "#F5F5F5";
+        }
+	</script>
+</head>
+<body>
+<div class="layui-fluid">
+   <div class="layui-card">
+    <form class="layui-form" action="../system/menuTree.do" method="post">
+		<input type="hidden" id="menuId" name="menu.id"/>
+        <div class="layui-card-body">
+			<div class="layui-tab">
+				<ul class="layui-tab-title">
+					<% if(has(modules) && modules != null){ for(i in modules) {%>
+					<li<% if(menu.id == i.id) {%> class="layui-this"<%}%> onclick="loadTree('${i.id}');">${i.name}</li>
+					<%}}%>
+					<#canVisit uri="/system/menuAdd.do">
+					<li class="layui-bg-gray"><a href="javascript:doAdd('菜单', 'menu', 1000, 800);">增加<i class="layui-icon layui-icon-add-1"></i></a></li>
+					</#canVisit>
+				</ul>
+				<div class="layui-tab-content">
+					<div class="layui-tab-item layui-show">
+						<ul id="ulTree"></ul>
+					</div>
+				</div>
+			</div>
+        </div>
+    </form>
+   </div>
+</div>
+
+<div id="menu" onclick="cancelBubble(window.event);">
+	<div class="itemTitle">右键菜单</div>
+  <#canVisit uri="/system/menuAdd.do">
+	<div id="Add" class="item" onmouseover="itemMouseover(this.id)" onmouseout="itemMouseout(this.id)">添加</div>
+	<hr class="itemHr">
+  </#canVisit>
+  <#canVisit uri="/system/menuUpdate.do">
+	<div id="Update" class="item" onmouseover="itemMouseover(this.id)" onmouseout="itemMouseout(this.id)">修改</div>
+	<hr class="itemHr">
+  </#canVisit>
+  <#canVisit uri="/system/menuDelete.do">
+	<div id="Delete" class="item" style="margin-bottom: 10px" onmouseover="itemMouseover(this.id)" onmouseout="itemMouseout(this.id)">删除</div>
+  </#canVisit>
+
+</div>
+</body>
+<script>
+	layui.use(['element', 'tree'], function(){
+        var element = layui.element;
+
+    	<%if(menu.id != null) {%>
+            loadTree('${menu.id}');
+        <%}%>
+    });
+
+    // 生成一个树
+    function loadTree(nodeId) {
+        if(document.getElementById("menuId").value == nodeId) return;
+
+        $.ajax({
+            type: "POST",
+            data: {moduleId: nodeId},
+            url: "../api/menu/getModule",
+            dataType: "json",
+            success: function(resp) {
+                console.log("getModule resp:");
+                console.log(resp);
+                if(resp.statusCode != 200) return;
+
+                var cldr = new Array();
+                var n = toLayUITreeNode(resp.data);
+                cldr.push(n);
+
+                $('#ulTree').html('');
+                layui.tree({
+                    elem: '#ulTree' //指定元素
+                    , click: function (item) {
+                        selectedNode = item;
+                    }
+                    , nodes: cldr
+                });
+
+                document.getElementById("menuId").value = nodeId;
+            },
+            error: function (obj, msg, e) {   //异常
+                console.log("load tree error : " + JSON.stringify(e));
+            }
+        });
+    }
+
+    function toLayUITreeNode(node) {
+        var tn = {};
+    	if(node == null) return tn;
+
+    	tn.id = node.id;
+    	tn.parentId = node.parentId;
+    	tn.orderBy = node.orderBy;
+    	// 图标
+		tn.icon = node.attributes.ICON_IMAGE;
+
+		var title = node.name;
+		if(tn.icon != null && tn.icon != '') {
+            title = '<i class="layui-icon ' + tn.icon + '"></i> ' + title;
+		}
+
+        tn.name = title;
+        tn.spread = true;
+
+    	// 处理子节点
+    	var sons = node.sons;
+    	var children = new Array();
+    	for(var i = 0; sons != null && i < sons.length; i++) {
+            children.push(toLayUITreeNode(sons[i]));
+    	}
+
+    	tn.children = children;
+        console.log("toLayUITreeNode");
+    	console.log(tn);
+    	return tn;
+    }
+
+    //====================== 新增页面 ===========================
+    function doAdd(unitCh, unitEn, width, height, parentId) {
+        var url = (parentId == null ? unitEn +"Add.do" : unitEn +"Add.do?menu.parentId=" + parentId);
+        // 打开对话框
+        openDialog(unitCh + '新增', url, width, height, function(result) {
+            // var mId = document.getElementById("menuId").value;
+        	// loadTree(mId);
+        	document.forms[0].submit();
+        });
+    }
+    function doUpdate(unitCh, unitEn, width, height, sltId) {
+        // 打开对话框
+        openDialog(unitCh + '修改', unitEn +"Update.do?id=" + sltId, width, height, function(result) {
+            // 成功执行（result.statusCode == 200）后的回调函数
+            if(result.statusCode != 200) return;
+
+        	document.forms[0].submit();
+        });
+    }
+    function doDelete(unitCh, unitEn, sltId) {
+        $.confirm("您确认要删除所选择的" + unitCh + "记录？", function(){
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: unitEn + "Delete.do?id="+sltId,
+                success: function(result) {
+                    if(result == null) {
+                        $.message("获取处理结果失败！");
+                        return;
+                    }
+
+                    if(result.statusCode == null) {
+                        $.message("识别处理结果失败！");
+                        return;
+                    }
+
+                    // 处理失败，给出提示信息
+                    if(result.statusCode != 200) {
+                        $.message(result.message);
+                        return;
+                    }
+
+                    // 成功执行（result.statusCode == 200）后的回调函数
+        			document.forms[0].submit();
+                }
+            });
+        });
+    }
+</script>
+</html>

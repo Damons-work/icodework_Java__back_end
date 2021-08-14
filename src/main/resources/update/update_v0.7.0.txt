@@ -1,0 +1,46 @@
+更新说明：
++ 审批配置
+	
+####################################
+	SQL更新:
+####################################
+DROP TABLE IF EXISTS `config_audit_base`;
+CREATE TABLE `config_audit_base` (
+  `AuditId` bigint(20) NOT NULL COMMENT '流程编号',
+  `BizCode` varchar(10) NOT NULL COMMENT '申请单类型编码，关联config_item_base.ItemCode[申请单类型]',
+  `OrganizationId` bigint(20) DEFAULT NULL COMMENT '适用组织机构的编号，关联basis_organization_base.OrganizationId',
+  `UserId` bigint(20) DEFAULT NULL COMMENT '申请人编号，关联system_user_base.UserId',
+  `ActiveFlag` tinyint(4) NOT NULL COMMENT '有效标识',
+  `ItemCount` tinyint(4) NOT NULL COMMENT '环节数量',
+  PRIMARY KEY (`AuditId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='审批流程';
+
+DROP TABLE IF EXISTS `config_audit_item`;
+CREATE TABLE `config_audit_item` (
+  `ItemId` bigint(20) NOT NULL COMMENT '环节编号',
+  `AuditId` bigint(20) NOT NULL COMMENT '审批流程编号，关联config_audit_base.AuditId',
+  `ChoiceRoleId` bigint(20) DEFAULT NULL COMMENT '审核角色编号，关联system_role_base.RoleId',
+  `ChoiceIds` varchar(1000) DEFAULT NULL COMMENT '审批人员编号串，以半角逗号间隔',
+  `AttendFlag` tinyint(4) NOT NULL COMMENT '审批标识{1：并签2：会签}',
+  `ContinueFlag` tinyint(4) NOT NULL COMMENT '驳回是否可以继续审批',
+  `TaskIndex` tinyint(4) NOT NULL COMMENT '任务序号（从1开始）',
+  PRIMARY KEY (`ItemId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='审批环节';
+
+DROP TABLE IF EXISTS `config_audit_task`;
+CREATE TABLE `config_audit_task` (
+  `TaskId` bigint(20) NOT NULL COMMENT '任务编号',
+  `BizCode` varchar(10) NOT NULL COMMENT '申请单类型编码，关联config_item_base.ItemCode[申请单类型]',
+  `BizNo` varchar(50) NOT NULL COMMENT '申请单编号',
+  `TaskIndex` tinyint(4) NOT NULL COMMENT '任务序号',
+  `PlanUserId` bigint(20) NOT NULL COMMENT '审批人编号，关联system_user_base.UserId',
+  `AttendFlag` tinyint(4) NOT NULL COMMENT '审批方式标识{1：并签2：会签}',
+  `ContinueFlag` tinyint(4) NOT NULL COMMENT '驳回时是否继续审批',
+  `StatusFlag` tinyint(4) NOT NULL COMMENT '状态标识{1：对列中，2：待审核，3：已审核}',
+  `AuditUserId` bigint(20) DEFAULT NULL COMMENT '实际审批人编号，关联system_user_base.UserId',
+  `AuditTime` datetime DEFAULT NULL COMMENT '审批时间',
+  `PassFlag` tinyint(4) DEFAULT NULL COMMENT '审批是否通过',
+  `AuditComment` varchar(200) DEFAULT NULL COMMENT '审批意见',
+  `CreateTime` datetime NOT NULL COMMENT '任务创建时间',
+  PRIMARY KEY (`TaskId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='审批任务';

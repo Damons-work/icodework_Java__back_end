@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}    
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" action="partnerSelect.do" method="post" onsubmit="return false">
+	  <input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+	  <input type="hidden" name="multiple" value="${parameter.multiple}"/>
+      <div class="layui-card">
+        <div class="layui-card-body">
+
+            <div class="layui-form-item">
+	
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">商户名称：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="partner.partnerName" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(partner.partnerName)}"
+								class="layui-input" style="width:150px" maxlength="100" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+	
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+					<a class="layui-btn" onclick="onSelected();"><i class="layui-icon layui-icon-ok"></i> 确定选择</a>
+					<a class="layui-btn layui-btn-warm" onclick="onClear();"><i class="layui-icon layui-icon-circle"></i> 清除选择</a>
+                </div>
+            </div>
+
+            <table class="layui-table" lay-data="{id:'selectTable'}">
+            <!--
+			 * ！！除非设计、指导人员有特别说明，否则此处的数据列不得随意增加、修改、删除！！
+			 * －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+			 * 
+			 * 为了页面效果，可以隐藏相关数据列。隐藏数据列，请修改相应的表头<th/>标签：
+			 * 
+			 * 修改lay-data属性，添加 hide:true，例如：
+			 *
+			 * <th lay-data="{field:'activeFlag',hide:true}"></th>
+            -->
+             <thead>
+             <tr>
+                <th width="30" class="center" lay-data="{field:'id',type:'${(!isEmpty(parameter.multiple) && parameter.multiple == 'true') ? "checkbox" : "radio"}', fixed: 'left'}">${(!isEmpty(parameter.multiple) && parameter.multiple == 'true') ? "" : "选择"}</th>
+		
+			  <th lay-data="{field:'partnerName'}">商户名称</th>
+			  
+			  <th lay-data="{field:'contactPerson'}">联系人</th>
+			  
+			  <th lay-data="{field:'phone'}">联系电话</th>
+			  
+			  <th lay-data="{field:'email'}">电子信箱</th>
+			  
+			  <th width="150" class="center" lay-data="{field:'createTime'}">创建时间</th>
+		
+			  <th lay-data="{field:'activeFlag',hide:true}"></th>		
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(partnerList) && partnerList != null){ for(i in partnerList) {%>
+                <tr>
+	                <td>${i.id}</td>
+			
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.partnerName)}</td>
+				  
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.contactPerson)}</td>
+				  
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.phone)}</td>
+				  
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.email)}</td>
+				  
+				  <td>${i.createTime, "yyyy-MM-dd HH:ss"}</td>
+			
+				  <td>${i.activeFlag}</td>			
+                </tr>
+                <%}}%>
+              </tbody>
+            </table>
+        </div>
+
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>    
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','table','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+
+		// 创建时间下限
+		laydate.render({
+			elem: '#createTimeBottom',
+			format: 'yyyy-MM-dd'
+		});
+		// 创建时间上限
+		laydate.render({
+			elem: '#createTimeTop',
+			format: 'yyyy-MM-dd'
+		});
+
+    });
+
+	// 确定选择
+	function onSelected() {
+		//获取checkbox选中的值
+		var checkStatus = layui.table.checkStatus('selectTable');
+		var data = checkStatus.data;
+		
+		if(data == null || data.length == 0) {
+			$.message("没有选择任何数据哦！");
+			return;
+		}
+		
+		var result = {
+			"statusCode" : 100,
+			"message" : "",
+			"dto" : data
+		};
+		
+		returnDialog(result);
+	}
+
+	// 清除选择
+	function onClear() {		
+		var result = {
+			"statusCode" : 100,
+			"message" : ""
+		};
+		
+		returnDialog(result);
+	}
+</script>
+</html>

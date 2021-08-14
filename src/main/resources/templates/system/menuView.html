@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+  <form id="fView" class="layui-form" onsubmit="return false" action="##">
+	<div class="layui-form-item"></div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">
+			<a class="layui-icon layui-icon-return" style="font-size:30px;" href="javascript:history.back();"></a>
+		</label>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">父菜单项编号，关联system_user_base.MenuId：</label>
+		<div class="layui-input-inline">${menu.parentId}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">菜单名称：</label>
+		<div class="layui-input-inline">${menu.menuName}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">图标文件或者class：</label>
+		<div class="layui-input-inline">${menu.iconImage}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">排序序号：</label>
+		<div class="layui-input-inline">${menu.orderBy}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">菜单地址：</label>
+		<div class="layui-input-inline">${menu.menuUrl}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">帮助文档地址：</label>
+		<div class="layui-input-inline">${menu.helpUrl}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">接口地址：</label>
+		<div class="layui-input-inline layui-form-mid">${menu.apiUrl}</div>
+	</div>
+  </form>
+</body>
+<script>
+	layui.use(['form','layer'], function(){
+        var layer = layui.layer;
+        var form  = layui.form;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+</script>
+</html>

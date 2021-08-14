@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.project.mapper.ProjectPersonMapper">
+	<!-- 数据映射 -->
+	<resultMap id="projectPersonMap" type="cn.js.icode.project.entity.ProjectPerson">
+		<id property="id" column="id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="personId" column="person_id"/>
+		<result property="isLeaderFlag" column="is_leader_flag"/>
+		<result property="beginDate" column="begin_date"/>
+		<result property="endDate" column="end_date"/>
+		<result property="timePercent" column="time_percent"/>
+		
+		<!-- 对象数据嵌套 -->
+		<association property="person" javaType="cn.js.icode.project.entity.Person">
+			<id property="id" column="person_id"/>
+			<result property="personName" column="person_name"/>
+			<result property="cost" column="cost"/>
+		</association>
+	</resultMap>
+    <!-- 查询项目内参与人员 -->
+    <!-- 查询单条项目内参与人员 -->
+    <select id="getObject" resultMap="projectPersonMap">
+        SELECT
+        T1.id, T1.project_id, T1.person_id, T1.is_leader_flag, T1.begin_date, T1.end_date, T1.time_percent,
+        T2.person_name, T2.cost
+        FROM project_project_person T1 left join project_person_base T2 on T1.person_id = T2.person_id
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND T1.project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND T1.person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.isLeaderFlag != null and where.isLeaderFlag">
+                        AND T1.is_leader_flag = 1
+                    </if>
+                    <if test="where != null and where.isLeaderFlag != null and !where.isLeaderFlag">
+                        AND T1.is_leader_flag = 0
+                    </if>
+	
+                    <if test="where != null and where.beginDate != null">
+						<![CDATA[ AND DATE_FORMAT(T1.begin_date, '%Y-%m-%d') = DATE_FORMAT(#{where.beginDate}, '%Y-%m-%d') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDate != null">
+						<![CDATA[ AND DATE_FORMAT(T1.end_date, '%Y-%m-%d') = DATE_FORMAT(#{where.endDate}, '%Y-%m-%d') ]]>
+                    </if>
+	
+                    <if test="where != null and where.timePercent != null">
+                        AND T1.time_percent = #{where.timePercent}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		ORDER BY T1.id limit 0, 1
+    </select>
+
+    <!-- 查询多条项目内参与人员 -->
+    <select id="list" resultMap="projectPersonMap">
+        SELECT
+        T1.id, T1.project_id, T1.person_id, T1.is_leader_flag, T1.begin_date, T1.end_date, T1.time_percent,
+        T2.person_name, T2.cost
+        FROM project_project_person T1 left join project_person_base T2 on T1.person_id = T2.person_id
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND T1.project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND T1.person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.isLeaderFlag != null and where.isLeaderFlag">
+                        AND T1.is_leader_flag = 1
+                    </if>
+                    <if test="where != null and where.isLeaderFlag != null and !where.isLeaderFlag">
+                        AND T1.is_leader_flag = 0
+                    </if>
+	
+                    <if test="where != null and where.beginDateBottom != null">
+						<![CDATA[ AND DATE_FORMAT(T1.begin_date, '%Y-%m-%d %H:%i') >= DATE_FORMAT(#{where.beginDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.beginDateTop != null">
+						<![CDATA[ AND DATE_FORMAT(T1.begin_date, '%Y-%m-%d %H:%i') <= DATE_FORMAT(#{where.beginDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDateBottom != null">
+						<![CDATA[ AND DATE_FORMAT(T1.end_date, '%Y-%m-%d %H:%i') >= DATE_FORMAT(#{where.endDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.endDateTop != null">
+						<![CDATA[ AND DATE_FORMAT(T1.end_date, '%Y-%m-%d %H:%i') <= DATE_FORMAT(#{where.endDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.timePercent != null">
+                        AND T1.time_percent = #{where.timePercent}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		<if test="pagination == null or pagination.dataSort == null or pagination.dataSort.fieldName == null">
+			ORDER BY T1.id
+        </if>
+        <if test="pagination != null and pagination.dataSort != null and pagination.dataSort.fieldName != null">
+			ORDER BY ${pagination.dataSort.fieldName}
+			<if test="pagination.dataSort.direction == 1">ASC</if>
+			<if test="pagination.dataSort.direction == -1">DESC</if>
+        </if>
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM project_project_person
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.isLeaderFlag != null and where.isLeaderFlag">
+                        AND is_leader_flag = 1
+                    </if>
+                    <if test="where != null and where.isLeaderFlag != null and !where.isLeaderFlag">
+                        AND is_leader_flag = 0
+                    </if>
+	
+                    <if test="where != null and where.beginDateBottom != null">
+						<![CDATA[ AND begin_date >= DATE_FORMAT(#{where.beginDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.beginDateTop != null">
+						<![CDATA[ AND begin_date <= DATE_FORMAT(#{where.beginDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDateBottom != null">
+						<![CDATA[ AND end_date >= DATE_FORMAT(#{where.endDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.endDateTop != null">
+						<![CDATA[ AND end_date <= DATE_FORMAT(#{where.endDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.timePercent != null">
+                        AND time_percent = #{where.timePercent}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增项目内参与人员 -->
+
+    <insert id="insert" parameterType="cn.js.icode.project.entity.ProjectPerson" useGeneratedKeys="true" keyProperty="data.id">
+
+        INSERT INTO project_project_person(id, project_id, person_id, is_leader_flag, begin_date, end_date, time_percent)
+        VALUES (
+        #{data.id}, 
+
+		#{data.projectId}, 
+	
+		#{data.personId}, 
+	
+		<if test="data.isLeaderFlag == null">null, </if>
+		<if test="data.isLeaderFlag != null and data.isLeaderFlag">1, </if>
+		<if test="data.isLeaderFlag != null and !data.isLeaderFlag">0, </if>
+	
+		#{data.beginDate}, 
+	
+		#{data.endDate}, 
+	
+		#{data.timePercent}
+	
+        )
+    </insert>
+
+    <!-- 修改项目内参与人员 -->
+    <update id="update">
+        UPDATE project_project_person
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                id = #{data.id},
+            </if>
+		
+			<if test="data.projectId != null">
+				project_id = #{data.projectId},
+			</if>
+	
+			<if test="data.personId != null">
+				person_id = #{data.personId},
+			</if>
+	
+			<if test="data.isLeaderFlag != null and data.isLeaderFlag">
+				is_leader_flag = 1,
+			</if>
+			<if test="data.isLeaderFlag != null and !data.isLeaderFlag">
+				is_leader_flag = 0,
+			</if>
+	
+            <if test="data.beginDate != null">
+                begin_date = #{data.beginDate},
+            </if>		
+	
+            <if test="data.endDate != null">
+                end_date = #{data.endDate},
+            </if>		
+	
+			<if test="data.timePercent != null">
+				time_percent = #{data.timePercent},
+			</if>
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.isLeaderFlag != null and where.isLeaderFlag">
+                        AND is_leader_flag = 1
+                    </if>
+                    <if test="where != null and where.isLeaderFlag != null and !where.isLeaderFlag">
+                        AND is_leader_flag = 0
+                    </if>
+	
+                    <if test="where != null and where.beginDateTop != null">
+						<![CDATA[ AND begin_date <= DATE_FORMAT(#{where.beginDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.beginDateBottom != null">
+						<![CDATA[ AND begin_date >= DATE_FORMAT(#{where.beginDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDateTop != null">
+						<![CDATA[ AND end_date <= DATE_FORMAT(#{where.endDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.endDateBottom != null">
+						<![CDATA[ AND end_date >= DATE_FORMAT(#{where.endDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.timePercent != null">
+                        AND time_percent = #{where.timePercent}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除项目内参与人员 -->
+    <delete id="delete">
+        DELETE FROM project_project_person
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.isLeaderFlag != null and where.isLeaderFlag">
+                        AND is_leader_flag = 1
+                    </if>
+                    <if test="where != null and where.isLeaderFlag != null and !where.isLeaderFlag">
+                        AND is_leader_flag = 0
+                    </if>
+	
+                    <if test="where != null and where.beginDateTop != null">
+						<![CDATA[ AND begin_date <= DATE_FORMAT(#{where.beginDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.beginDateBottom != null">
+						<![CDATA[ AND begin_date >= DATE_FORMAT(#{where.beginDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDateTop != null">
+						<![CDATA[ AND end_date <= DATE_FORMAT(#{where.endDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.endDateBottom != null">
+						<![CDATA[ AND end_date >= DATE_FORMAT(#{where.endDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.timePercent != null">
+                        AND time_percent = #{where.timePercent}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

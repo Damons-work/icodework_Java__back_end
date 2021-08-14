@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.config.mapper.ParameterMapper">
+    <!-- 查询系统参数信息 -->
+    <!-- 查询单条系统参数信息 -->
+    <select id="getObject" resultType="cn.js.icode.config.data.Parameter">
+        SELECT
+        ParameterId, ParameterName, ParameterValue, Module, Remark
+        FROM config_parameter_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ParameterId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parameterName != null and where.parameterName != ''">
+                        AND ParameterName = #{where.parameterName}
+                    </if>
+                    <if test="where != null and where.parameterValue != null and where.parameterValue != ''">
+                        AND ParameterValue = #{where.parameterValue}
+                    </if>
+                    <if test="where != null and where.module != null and where.module != ''">
+                        AND Module = #{where.module}
+                    </if>
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark = #{where.remark}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY ParameterId DESC limit 0, 1
+    </select>
+    <!-- 查询多条系统参数信息 -->
+    <select id="list" resultType="cn.js.icode.config.data.Parameter">
+        SELECT
+        ParameterId, ParameterName, ParameterValue, Module, Remark
+        FROM config_parameter_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ParameterId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parameterName != null and where.parameterName != ''">
+                        AND ParameterName like concat('%', #{where.parameterName}, '%')
+                    </if>
+                    <if test="where != null and where.parameterValue != null and where.parameterValue != ''">
+                        AND ParameterValue like concat('%', #{where.parameterValue}, '%')
+                    </if>
+                    <if test="where != null and where.module != null and where.module != ''">
+                        AND Module like concat('%', #{where.module}, '%')
+                    </if>
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark like concat('%', #{where.remark}, '%')
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY ParameterId DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM config_parameter_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ParameterId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parameterName != null and where.parameterName != ''">
+                        AND ParameterName like concat('%', #{where.parameterName}, '%')
+                    </if>
+                    <if test="where != null and where.parameterValue != null and where.parameterValue != ''">
+                        AND ParameterValue like concat('%', #{where.parameterValue}, '%')
+                    </if>
+                    <if test="where != null and where.module != null and where.module != ''">
+                        AND Module like concat('%', #{where.module}, '%')
+                    </if>
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark like concat('%', #{where.remark}, '%')
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO config_parameter_base(ParameterId, ParameterName, ParameterValue, Module, Remark, UpdateTime)
+        VALUES (
+        #{data.id},
+		#{data.parameterName},
+		#{data.parameterValue},
+		#{data.module},
+		#{data.remark},
+		now()
+        )
+    </insert>
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE config_parameter_base
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="data.id != null">
+                ParameterId = #{data.id},
+            </if>
+			<if test="data.parameterName != null">
+				ParameterName = #{data.parameterName},
+			</if>
+			<if test="data.parameterValue != null">
+				ParameterValue = #{data.parameterValue},
+			</if>
+			<if test="data.module != null">
+				Module = #{data.module},
+			</if>
+			<if test="data.remark != null">
+				Remark = #{data.remark},
+			</if>
+	
+			UpdateTime = now()
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ParameterId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parameterName != null">
+                        AND ParameterName = #{where.parameterName}
+                    </if>
+                    <if test="where != null and where.parameterValue != null">
+                        AND ParameterValue = #{where.parameterValue}
+                    </if>
+                    <if test="where != null and where.module != null">
+                        AND Module = #{where.module}
+                    </if>
+                    <if test="where != null and where.remark != null">
+                        AND Remark = #{where.remark}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+    <!-- 删除系统参数信息 -->
+    <delete id="delete">
+        DELETE FROM config_parameter_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ParameterId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parameterName != null">
+                        AND ParameterName = #{where.parameterName}
+                    </if>
+                    <if test="where != null and where.parameterValue != null">
+                        AND ParameterValue = #{where.parameterValue}
+                    </if>
+                    <if test="where != null and where.module != null">
+                        AND Module = #{where.module}
+                    </if>
+                    <if test="where != null and where.remark != null">
+                        AND Remark = #{where.remark}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

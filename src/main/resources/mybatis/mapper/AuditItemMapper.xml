@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.config.mapper.AuditItemMapper">
+    <!-- 查询审批环节信息 -->
+    <!-- 查询单条审批环节信息 -->
+    <select id="getObject" resultType="cn.js.icode.config.data.AuditItem">
+        SELECT
+        ItemId, AuditId, ChoiceRoleId, ChoiceIds, AttendFlag, ContinueFlag, TaskIndex
+        FROM config_audit_item
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.auditId != null">
+                        AND AuditId = #{where.auditId}
+                    </if>
+	
+                    <if test="where != null and where.choiceRoleId != null">
+                        AND ChoiceRoleId = #{where.choiceRoleId}
+                    </if>
+	
+                    <if test="where != null and where.choiceIds != null and where.choiceIds != ''">
+                        AND ChoiceIds = #{where.choiceIds}
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY TaskIndex limit 0, 1
+    </select>
+
+    <!-- 查询多条审批环节信息 -->
+    <select id="list" resultType="cn.js.icode.config.data.AuditItem">
+        SELECT
+        ItemId, AuditId, ChoiceRoleId, ChoiceIds, AttendFlag, ContinueFlag, TaskIndex
+        FROM config_audit_item
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.auditId != null">
+                        AND AuditId = #{where.auditId}
+                    </if>
+	
+                    <if test="where != null and where.choiceRoleId != null">
+                        AND ChoiceRoleId = #{where.choiceRoleId}
+                    </if>
+	
+                    <if test="where != null and where.choiceIds != null and where.choiceIds != ''">
+                        AND ChoiceIds like concat('%', #{where.choiceIds}, '%')
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY TaskIndex
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM config_audit_item
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.auditId != null">
+                        AND AuditId = #{where.auditId}
+                    </if>
+	
+                    <if test="where != null and where.choiceRoleId != null">
+                        AND ChoiceRoleId = #{where.choiceRoleId}
+                    </if>
+	
+                    <if test="where != null and where.choiceIds != null and where.choiceIds != ''">
+                        AND ChoiceIds like concat('%', #{where.choiceIds}, '%')
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO config_audit_item(ItemId, AuditId, ChoiceRoleId, ChoiceIds, AttendFlag, ContinueFlag, TaskIndex)
+        VALUES (
+        #{data.id}, 
+
+		#{data.auditId}, 
+	
+		#{data.choiceRoleId}, 
+	
+		#{data.choiceIds}, 
+	
+		#{data.attendFlag}, 
+	
+		<if test="data.continueFlag == null">null, </if>
+		<if test="data.continueFlag != null and data.continueFlag">1, </if>
+		<if test="data.continueFlag != null and !data.continueFlag">0, </if>
+	
+		#{data.taskIndex}
+	
+        )
+    </insert>
+
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE config_audit_item
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                ItemId = #{data.id},
+            </if>
+		
+			<if test="data.auditId != null">
+				AuditId = #{data.auditId},
+			</if>
+	
+			<if test="data.choiceRoleId != null">
+				ChoiceRoleId = #{data.choiceRoleId},
+			</if>
+	
+			<if test="data.choiceIds != null">
+				ChoiceIds = #{data.choiceIds},
+			</if>
+	
+			<if test="data.attendFlag != null">
+				AttendFlag = #{data.attendFlag},
+			</if>
+	
+			<if test="data.continueFlag != null and data.continueFlag">
+				ContinueFlag = 1,
+			</if>
+			<if test="data.continueFlag != null and !data.continueFlag">
+				ContinueFlag = 0,
+			</if>
+	
+			<if test="data.taskIndex != null">
+				TaskIndex = #{data.taskIndex},
+			</if>
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.auditId != null">
+                        AND AuditId = #{where.auditId}
+                    </if>
+	
+                    <if test="where != null and where.choiceRoleId != null">
+                        AND ChoiceRoleId = #{where.choiceRoleId}
+                    </if>
+	
+                    <if test="where != null and where.choiceIds != null">
+                        AND ChoiceIds = #{where.choiceIds}
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除审批环节信息 -->
+    <delete id="delete">
+        DELETE FROM config_audit_item
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.auditId != null">
+                        AND AuditId = #{where.auditId}
+                    </if>
+	
+                    <if test="where != null and where.choiceRoleId != null">
+                        AND ChoiceRoleId = #{where.choiceRoleId}
+                    </if>
+	
+                    <if test="where != null and where.choiceIds != null">
+                        AND ChoiceIds = #{where.choiceIds}
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

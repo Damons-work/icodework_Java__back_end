@@ -1,0 +1,28 @@
+更新说明：
++ 商户管理功能
++ 管理后台后“我的账号”查看
+	
+
+####################################
+	SQL更新:
+####################################
+
+-- 商户列表
+create table basis_partner_base (
+ PartnerId char(36) primary key not null comment '商户编号',
+ PartnerName varchar(200) not null comment '商户名称',
+ ContactPerson varchar(50) comment '联系人',
+ Phone varchar(50) comment '联系电话',
+ Email varchar(100) not null comment '电子信箱',
+ CreateTime DateTime comment '创建时间',
+ ActiveFlag tinyint not null comment '是否有效'
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8 comment='商户信息';
+
+alter table system_user_base add PartnerId char(36) comment '所属商户编号，关联basis_partner_base.PartnerId' after UserId;
+
+
+####################################
+	配置更新:
+####################################
+
+filter.PermissionFilter.parameter.no_validation_urls 添加：/system/myAccountView.do

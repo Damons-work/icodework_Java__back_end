@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" method="post">
+      <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">所属模块：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="parameter.module" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(parameter.module)}"
+								class="layui-input" maxlength="25" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+	                <#canVisit uri="/config/parameterAdd.do">
+	                <a class="layui-btn layui-btn-warm" onclick="doAdd('系统参数', 'parameter', 720, 450);">新增</a>
+	                </#canVisit>
+                </div>
+            </div>
+            <table class="layui-table">
+             <thead>
+             <tr>
+			  <th>所属模块</th>
+			  <th>参数名称</th>
+			  <th>参数数值</th>
+			  <th>参数说明</th>
+                <th width="80" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(parameterList) && parameterList != null && !isEmpty(parameterList)){ for(i in parameterList) {%>
+                <tr>
+				  <td>${i.module}</td>
+				  <td>${i.parameterName}</td>
+				  <td>${i.parameterValue}</td>
+				  <td>${i.remark}</td>
+	                <td>
+	                <#canVisit uri="/config/parameterUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('系统参数', 'parameter', 720, 450, '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/config/parameterDelete.do">
+	                    <i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('系统参数', 'parameter', '${i.id}');"></i>
+	                </#canVisit>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+</script>
+</html>

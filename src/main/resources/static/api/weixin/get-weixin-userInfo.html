@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!-- 
+	基于第三方平台 - 获取用户信息
+	
+	接受参数：
+	grantId        ：公众号绑定编号
+	returnUrl      ：返回地址
+	
+	1. 获取的用户信息将会保存在localStorage中，key为：OAuth_user
+	2. 将用户信息保存之后，转向到返回地址returnUrl，在返回地址的页面里从localStorage中获取用户信息
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+
+<body>
+<script>
+	/**
+	 * 动态加载JS
+	 * @param {string} url 脚本地址
+	 * @param {function} callback  回调函数
+	 */
+	function dynamicLoadJs(url, callback) {
+	    var head = document.getElementsByTagName('head')[0];
+	    var script = document.createElement('script');
+	    script.type = 'text/javascript';
+	    script.src = url;
+	    if(typeof(callback)=='function'){
+	        script.onload = script.onreadystatechange = function () {
+	            if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete"){
+	                callback();
+	                script.onload = script.onreadystatechange = null;
+	            }
+	        };
+	    }
+	    head.appendChild(script);
+	}
+ 
+	var GWC = {
+	    version: '1.2.0',
+	    urlParams: {},
+	    appendParams: function (url, params) {
+	        if (params) {
+	            var baseWithSearch = url.split('#')[0];
+	            var hash = url.split('#')[1];
+	            for (var key in params) {
+	                var attrValue = params[key];
+	                if (attrValue !== undefined) {
+	                    var newParam = key + "=" + attrValue;
+	                    if (baseWithSearch.indexOf('?') > 0) {
+	                        var oldParamReg = new RegExp('^' + key + '=[-%.!~*\'\(\)\\w]*', 'g');
+	                        if (oldParamReg.test(baseWithSearch)) {
+	                            baseWithSearch = baseWithSearch.replace(oldParamReg, newParam);
+	                        } else {
+	                            baseWithSearch += "&" + newParam;
+	                        }
+	                    } else {
+	                        baseWithSearch += "?" + newParam;
+	                    }
+	                }
+	            }
+	            if (hash) {
+	                url = baseWithSearch + '#' + hash;
+	            } else {
+	                url = baseWithSearch;
+	            }
+	        }
+	        return url;
+	    },
+	    getUrlParams: function () {
+	        var pairs = location.search.substring(1).split('&');
+	        for (var i = 0; i < pairs.length; i++) {
+	            var pos = pairs[i].indexOf('=');
+	            if (pos === -1) {
+	                continue;
+	            }
+	            GWC.urlParams[pairs[i].substring(0, pos)] = decodeURIComponent(pairs[i].substring(pos + 1));
+	        }
+	    },
+	    doRedirect: function () {
+	    	// 清除原有weixin_oAuth
+	    	localStorage.removeItem("weixin_oAuth");
+	    	
+	        var code = GWC.urlParams['code'];
+	        var grantId = GWC.urlParams['grantId'];
+	        var redirectUri;
+	        if (!code) {
+	        	// 使用同步调用获得Code
+	        	var returnUrl = location.href;
+	        	$.ajax({
+	        		type: 'GET',
+	        		async: false,
+	        		url : "codeGetter?grantId=" + grantId + "&returnUrl=" + encodeURIComponent(returnUrl) + "&t=" + (new Date()).getTime(),
+	        		success: function(data) {
+	        			if(data == null || data.statusCode != 200) {
+	        				return;
+	        			}
+	        			redirectUri = data.data;
+	        		}
+	        	});
+	        } else {
+	            // 第二步，从微信授权页面跳转回来，已经获取到了code，调用接口，获得用户信息
+				var strUser = null;
+	        	$.ajax({
+	        		type: 'GET',
+	        		async: false,
+	        		url : "userInfo?grantId=" + grantId + "&code=" + code + "&t=" + (new Date()).getTime(),
+	        		success: function(data) {
+	        			if(data == null || data.statusCode != 200) {
+	        				return;
+	        			}
+	        			// 只能以字符串保存
+						strUser = JSON.stringify(data.data);
+						// alert("0x01. " + strUser);
+	        		}
+	        	});
+	        	
+	            // 跳转到returnUrl
+	            redirectUri = GWC.urlParams['returnUrl'];
+	            // alert("returnUrl : " + redirectUri);
+				if(strUser != null) {
+					// 放入localStorage做同域传递（不可跨域）
+	        		localStorage.setItem("OAuth_user", strUser);
+					// 使用GET方式传递（可跨域）
+					if(redirectUri.indexOf("?") >= 0) {
+						redirectUri += "&";
+					} else {
+						redirectUri += "?";
+					}
+					redirectUri += "OAuth_user=" + encodeURIComponent(strUser)
+				}
+	        }
+	        
+	        // alert(redirectUri);
+	        location.href = redirectUri;
+	    }
+	};
+	
+	GWC.getUrlParams();
+
+	if(typeof jQuery == 'undefined') {
+		// 加载jquery
+		dynamicLoadJs('https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js',function() {
+			// 执行逻辑
+			GWC.doRedirect();
+		});
+	} else {
+		// 执行逻辑
+		GWC.doRedirect();
+	}
+</script>
+</body>
+</html>

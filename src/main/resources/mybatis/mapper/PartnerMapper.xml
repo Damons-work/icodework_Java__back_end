@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.basis.mapper.PartnerMapper">
+    <!-- 查询商户信息信息 -->
+    <!-- 查询单条商户信息信息 -->
+    <select id="getObject" resultType="cn.js.icode.basis.data.Partner">
+        SELECT
+        PartnerId, PartnerName, ContactPerson, Phone, Email, CreateTime, ActiveFlag
+        FROM basis_partner_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null and where.id != ''">
+                    PartnerId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerName != null and where.partnerName != ''">
+                        AND PartnerName = #{where.partnerName}
+                    </if>
+	
+                    <if test="where != null and where.contactPerson != null and where.contactPerson != ''">
+                        AND ContactPerson = #{where.contactPerson}
+                    </if>
+	
+                    <if test="where != null and where.phone != null and where.phone != ''">
+                        AND Phone = #{where.phone}
+                    </if>
+	
+                    <if test="where != null and where.email != null and where.email != ''">
+                        AND Email = #{where.email}
+                    </if>
+	
+                    <if test="where != null and where.createTime != null">
+						<![CDATA[ AND CreateTime = DATE_FORMAT(#{where.createTime}, '%Y-%m-%d') ]]>
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY PartnerId DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条商户信息信息 -->
+    <select id="list" resultType="cn.js.icode.basis.data.Partner">
+        SELECT
+        PartnerId, PartnerName, ContactPerson, Phone, Email, CreateTime, ActiveFlag
+        FROM basis_partner_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null and where.id != ''">
+                    PartnerId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerName != null and where.partnerName != ''">
+                        AND PartnerName like concat('%', #{where.partnerName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.contactPerson != null and where.contactPerson != ''">
+                        AND ContactPerson like concat('%', #{where.contactPerson}, '%')
+                    </if>
+	
+                    <if test="where != null and where.phone != null and where.phone != ''">
+                        AND Phone like concat('%', #{where.phone}, '%')
+                    </if>
+	
+                    <if test="where != null and where.email != null and where.email != ''">
+                        AND Email like concat('%', #{where.email}, '%')
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY PartnerId DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM basis_partner_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null and where.id != ''">
+                    PartnerId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerName != null and where.partnerName != ''">
+                        AND PartnerName like concat('%', #{where.partnerName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.contactPerson != null and where.contactPerson != ''">
+                        AND ContactPerson like concat('%', #{where.contactPerson}, '%')
+                    </if>
+	
+                    <if test="where != null and where.phone != null and where.phone != ''">
+                        AND Phone like concat('%', #{where.phone}, '%')
+                    </if>
+	
+                    <if test="where != null and where.email != null and where.email != ''">
+                        AND Email like concat('%', #{where.email}, '%')
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO basis_partner_base(PartnerId, PartnerName, ContactPerson, Phone, Email, CreateTime, ActiveFlag, UpdateTime)
+        VALUES (
+        #{data.id}, 
+
+		#{data.partnerName}, 
+	
+		#{data.contactPerson}, 
+	
+		#{data.phone}, 
+	
+		#{data.email}, 
+	
+		#{data.createTime}, 
+	
+		<if test="data.activeFlag == null">null</if>
+		<if test="data.activeFlag != null and data.activeFlag">1</if>
+		<if test="data.activeFlag != null and !data.activeFlag">0</if>,
+		now()	
+        )
+    </insert>
+
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE basis_partner_base
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null and data.id != ''">
+                PartnerId = #{data.id},
+            </if>
+		
+			<if test="data.partnerName != null">
+				PartnerName = #{data.partnerName},
+			</if>
+	
+			<if test="data.contactPerson != null">
+				ContactPerson = #{data.contactPerson},
+			</if>
+	
+			<if test="data.phone != null">
+				Phone = #{data.phone},
+			</if>
+	
+			<if test="data.email != null">
+				Email = #{data.email},
+			</if>
+	
+            <if test="data.createTime != null">
+                CreateTime = #{data.createTime},
+            </if>		
+	
+			<if test="data.activeFlag != null and data.activeFlag">
+				ActiveFlag = 1,
+			</if>
+			<if test="data.activeFlag != null and !data.activeFlag">
+				ActiveFlag = 0,
+			</if>
+	
+			UpdateTime = now()
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null and where.id != ''">
+                    PartnerId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerName != null">
+                        AND PartnerName = #{where.partnerName}
+                    </if>
+	
+                    <if test="where != null and where.contactPerson != null">
+                        AND ContactPerson = #{where.contactPerson}
+                    </if>
+	
+                    <if test="where != null and where.phone != null">
+                        AND Phone = #{where.phone}
+                    </if>
+	
+                    <if test="where != null and where.email != null">
+                        AND Email = #{where.email}
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除商户信息信息 -->
+    <delete id="delete">
+        DELETE FROM basis_partner_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null and where.id != ''">
+                    PartnerId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerName != null">
+                        AND PartnerName = #{where.partnerName}
+                    </if>
+	
+                    <if test="where != null and where.contactPerson != null">
+                        AND ContactPerson = #{where.contactPerson}
+                    </if>
+	
+                    <if test="where != null and where.phone != null">
+                        AND Phone = #{where.phone}
+                    </if>
+	
+                    <if test="where != null and where.email != null">
+                        AND Email = #{where.email}
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

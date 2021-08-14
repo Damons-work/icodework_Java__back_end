@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    
+    include("/static/include/css.html"){}
+
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" action="partnerList.do" method="post" onsubmit="return false">
+      <div class="layui-card">
+        <div class="layui-card-body">
+
+            <div class="layui-form-item">
+	
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">商户名称：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="partner.partnerName" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(partner.partnerName)}"
+								class="layui-input" style="width:150px" maxlength="100" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+	
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">是否有效：</label>
+                    <div class="layui-input-inline">
+						<input type="radio" name="partner.activeFlag" value="true" title="有效"<% if(partner.activeFlag != null && partner.activeFlag) {%> checked<%}%>/>
+						<input type="radio" name="partner.activeFlag" value="false" title="禁用"<% if(partner.activeFlag == null || !partner.activeFlag) {%> checked<%}%>/>
+					</div>
+                </div>
+	
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+	                <#canVisit uri="/basis/partnerAdd.do">
+	                <a class="layui-btn layui-btn-warm" onclick="doAdd('商户信息', 'partner', 750, 450);">新增</a>
+	                </#canVisit>
+                </div>
+            </div>
+
+            <table class="layui-table">
+             <thead>
+             <tr>	
+		  <th>商户名称</th>
+		  
+		  <th>联系人</th>
+		  
+		  <th>联系电话</th>
+		  
+		  <th>电子信箱</th>
+		  
+		  <th width="150" class="center">创建时间</th>
+	
+		  <th width="100">是否有效</th>
+	
+                <th width="80" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(partnerList) && partnerList != null && !isEmpty(partnerList)){ for(i in partnerList) {%>
+                <tr>
+				  <td><a href="javascript:doView('商户信息', 'partner', 720, 450, '${i.id}');" style="color:#01AAED;">${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.partnerName)}</a></td>
+				  
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.contactPerson)}</td>
+				  
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.phone)}</td>
+				  
+				  <td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.email)}</td>
+				  
+				  <td>${i.createTime, "yyyy-MM-dd HH:ss"}</td>
+			
+				  <td>${(i.activeFlag != null && i.activeFlag) ? "有效" : "禁用"}</td>
+			
+	                <td>
+	                <#canVisit uri="/basis/partnerUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('商户信息', 'partner', 750, 450, '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/basis/partnerDelete.do">
+	                    <i class="layui-icon ${i.activeFlag?'layui-icon-delete':'layui-icon-refresh-1'}" title="${i.activeFlag?'禁用':'恢复'}" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('商户信息', 'partner', '${i.id}', this.title);"></i>
+	                </#canVisit>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>    
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+
+		// 创建时间下限
+		laydate.render({
+			elem: '#createTimeBottom',
+			format: 'yyyy-MM-dd'
+		});
+		// 创建时间上限
+		laydate.render({
+			elem: '#createTimeTop',
+			format: 'yyyy-MM-dd'
+		});
+
+    });
+	
+	function doDelete(unitCh, unitEn, sltId, action) {
+        $.confirm("您确认要" + action + "所选择的" + unitCh + "记录？", function(){
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: unitEn + "Delete.do?id="+sltId,
+                success: function(result) {
+                    if(result == null) {
+                        $.message("获取处理结果失败！");
+                        return;
+                    }
+
+                    if(result.statusCode == null) {
+                        $.message("识别处理结果失败！");
+                        return;
+                    }
+
+                    // 处理失败，给出提示信息
+                    if(result.statusCode != 200) {
+                        $.message(result.message);
+                        return;
+                    }
+
+                    // 成功执行（result.statusCode == 200）后的回调函数
+                    submitForm();
+
+                    // 显示成功
+                    if(result.message != null && $.trim(result.message) != '') {
+                        $.message(result.message);
+                    }
+                }
+            });
+        });
+    }
+</script>
+</html>

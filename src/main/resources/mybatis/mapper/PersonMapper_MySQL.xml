@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.project.mapper.PersonMapper">
+	<!-- 数据映射 -->
+	<resultMap id="personMap" type="cn.js.icode.project.entity.Person">
+		<id property="id" column="person_id"/>
+		<result property="personName" column="person_name"/>
+		<result property="cost" column="cost"/>
+		<result property="wxOpenId" column="wx_open_id"/>
+		<result property="activeFlag" column="active_flag"/>
+		
+		<!-- 对象数据嵌套 -->
+		<!--
+		<association property="otherPojo" javaType="package.OtherPojo">
+			<result property="propertyName" column="ColumnName"/>
+		</association>
+		-->
+	</resultMap>
+    <!-- 查询人员信息 -->
+    <!-- 查询单条人员信息 -->
+    <select id="getObject" resultMap="personMap">
+        SELECT
+        T1.person_id, T1.person_name, T1.cost, T1.wx_open_id, T1.active_flag
+        FROM project_person_base T1
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.person_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.personName != null and where.personName != ''">
+                        AND T1.person_name = #{where.personName}
+                    </if>
+	
+                    <if test="where != null and where.cost != null">
+                        AND T1.cost = #{where.cost}
+                    </if>
+	
+                    <if test="where != null and where.wxOpenId != null and where.wxOpenId != ''">
+                        AND T1.wx_open_id = #{where.wxOpenId}
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND T1.active_flag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND T1.active_flag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		ORDER BY T1.person_id DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条人员信息 -->
+    <select id="list" resultMap="personMap">
+        SELECT
+        T1.person_id, T1.person_name, T1.cost, T1.wx_open_id, T1.active_flag
+        FROM project_person_base T1
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.person_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.personName != null and where.personName != ''">
+                        AND T1.person_name like concat('%', #{where.personName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.cost != null">
+                        AND T1.cost = #{where.cost}
+                    </if>
+	
+                    <if test="where != null and where.wxOpenId != null and where.wxOpenId != ''">
+                        AND T1.wx_open_id like concat('%', #{where.wxOpenId}, '%')
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND T1.active_flag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND T1.active_flag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		<if test="pagination == null or pagination.dataSort == null or pagination.dataSort.fieldName == null">
+			ORDER BY T1.person_id DESC
+        </if>
+        <if test="pagination != null and pagination.dataSort != null and pagination.dataSort.fieldName != null">
+			ORDER BY ${pagination.dataSort.fieldName}
+			<if test="pagination.dataSort.direction == 1">ASC</if>
+			<if test="pagination.dataSort.direction == -1">DESC</if>
+        </if>
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM project_person_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    person_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.personName != null and where.personName != ''">
+                        AND person_name like concat('%', #{where.personName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.cost != null">
+                        AND cost = #{where.cost}
+                    </if>
+	
+                    <if test="where != null and where.wxOpenId != null and where.wxOpenId != ''">
+                        AND wx_open_id like concat('%', #{where.wxOpenId}, '%')
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND active_flag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND active_flag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增人员信息 -->
+
+    <insert id="insert" parameterType="cn.js.icode.project.entity.Person" useGeneratedKeys="true" keyProperty="data.id">
+
+        INSERT INTO project_person_base(person_id, person_name, cost, wx_open_id, active_flag)
+        VALUES (
+        #{data.id}, 
+
+		#{data.personName}, 
+	
+		#{data.cost}, 
+	
+		#{data.wxOpenId}, 
+	
+		<if test="data.activeFlag == null">null</if>
+		<if test="data.activeFlag != null and data.activeFlag">1</if>
+		<if test="data.activeFlag != null and !data.activeFlag">0</if>
+	
+        )
+    </insert>
+
+    <!-- 修改人员信息 -->
+    <update id="update">
+        UPDATE project_person_base
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                person_id = #{data.id},
+            </if>
+		
+			<if test="data.personName != null">
+				person_name = #{data.personName},
+			</if>
+	
+			<if test="data.cost != null">
+				cost = #{data.cost},
+			</if>
+	
+			<if test="data.wxOpenId != null">
+				wx_open_id = #{data.wxOpenId},
+			</if>
+	
+			<if test="data.activeFlag != null and data.activeFlag">
+				active_flag = 1,
+			</if>
+			<if test="data.activeFlag != null and !data.activeFlag">
+				active_flag = 0,
+			</if>
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    person_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.personName != null">
+                        AND person_name = #{where.personName}
+                    </if>
+	
+                    <if test="where != null and where.cost != null">
+                        AND cost = #{where.cost}
+                    </if>
+	
+                    <if test="where != null and where.wxOpenId != null">
+                        AND wx_open_id = #{where.wxOpenId}
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND active_flag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND active_flag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除人员信息 -->
+    <delete id="delete">
+        DELETE FROM project_person_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    person_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.personName != null">
+                        AND person_name = #{where.personName}
+                    </if>
+	
+                    <if test="where != null and where.cost != null">
+                        AND cost = #{where.cost}
+                    </if>
+	
+                    <if test="where != null and where.wxOpenId != null">
+                        AND wx_open_id = #{where.wxOpenId}
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND active_flag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND active_flag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

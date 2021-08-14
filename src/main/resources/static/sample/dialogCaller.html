@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<!-- 
+	对话框调用者，用于测试对话框功能及对话框返回的数据
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="shortcut icon" href="../common/images/favicon.ico">
+  <link rel="stylesheet" href="../layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../layuiadmin/style/admin.css" media="all">
+  <script>
+  	// 获取根域名
+	var arr = location.hostname.split('.');
+	while(arr.length > 2) {
+		arr = arr.slice(1);
+		try {
+			// 设置根域名为document.domain
+			document.domain = arr.join('.');
+		} catch (e) {}
+	}
+  </script>
+  <script language="javascript" src="../js/jquery-3.3.1.min.js"></script>
+  <script language="javascript" src="../layuiadmin/layui/layui.js"></script>  
+  <script language="javascript" src="../js/jquery-icode.js"></script>
+</head>
+
+<body>
+<div class="layui-fluid">
+	<form id="fDialog" class="layui-form" onsubmit="return false" action="#">
+		<div class="layui-card">
+			<div class="layui-card-body" style="padding: 15px;">
+				<div class="layui-form-item">
+					<label class="layui-form-label">页面地址 <span style="color:#FF5722;">*</span></label>
+					<div class="layui-input-block">
+						<input type="text" name="txUrl" placeholder="输入对话框全地址，包括http://" autocomplete="off" class="layui-input" maxlength="200"/>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">对话框宽度</label>
+						<div class="layui-input-inline">
+							<input type="text" name="txWidth" autocomplete="off" class="layui-input" value="800" maxlength="4" placeholder="缺省 800，单位：像素"/>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">对话框高度</label>
+						<div class="layui-input-inline">
+							<input type="text" name="txHeight" autocomplete="off" class="layui-input" value="600" maxlength="4" placeholder="缺省 600，单位：像素"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-form-item layui-layout-admin">
+			<div class="layui-input-block">
+				<div class="layui-footer" style="left: 0;">
+					<button class="layui-btn" onclick="openUrl();">点击打开</button>
+				</div>
+			</div>
+		</div>		
+	</form>
+</div>
+</body>
+<script>
+	layui.use(['form'], function(){
+        var form  = layui.form;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+	
+	function openUrl() {
+		// 对话框地址
+		var url = $.trim(document.forms[0]["txUrl"].value);
+		if(url == '') {
+			$.alert("请输入页面地址！");
+			return;
+		}
+		
+		var w = $.trim(document.forms[0]["txWidth"].value);
+		var h = $.trim(document.forms[0]["txHeight"].value);
+		if(!isPositiveInteger(w)) w = 800;
+		if(!isPositiveInteger(h)) h = 600;
+		
+		// 打开对话框
+		openDialog('对话框调用者', url, w, h, function(result) {
+		    $.alert("<b>对话框返回值：</b><hr/>" + JSON.stringify(result));
+		});
+	}
+</script>
+</html>

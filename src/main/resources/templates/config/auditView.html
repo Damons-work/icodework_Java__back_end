@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+	<form id="fView" class="layui-form" onsubmit="return false" action="##">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+		
+  		<div class="layui-card">
+			<!-- 如需要header信息，放开下面的comment -->
+			<div class="layui-card-header">基础信息</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<!-- 如一行显示多列数据，参照下面的示例 -->
+				<!-- 
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">属性1：</label>
+						<div class="layui-input-inline">属性1对应数值</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">属性2：</label>
+						<div class="layui-input-inline">属性1对应数值</div>
+					</div>
+				</div>
+				-->
+
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">申请单：</label>
+						<div class="layui-input-inline layui-form-mid">${audit.biz.itemName}（${audit.bizCode}）</div>
+					</div>
+	  
+					<div class="layui-inline">
+						<label class="layui-form-label">有效标识：</label>
+						<div class="layui-input-inline layui-form-mid">${(audit.activeFlag != null && audit.activeFlag)?'有效':'禁用'}</div>
+					</div>
+				</div>
+	  
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">适用组织：</label>
+						<div class="layui-input-inline layui-form-mid">${isEmpty(audit.organization)?'':audit.organization.organizationName}</div>
+					</div>
+	  
+					<div class="layui-inline">
+						<label class="layui-form-label">申请人：</label>
+						<div class="layui-input-inline layui-form-mid">${isEmpty(audit.user)?'':audit.user.userName}</div>
+					</div>
+				</div>	  
+			</div>
+		</div>
+		
+		<div class="layui-card">
+			<div class="layui-card-header">审批环节</div>
+			<div class="layui-card-body" style="padding: 15px;">	  
+
+				<table class="layui-table" id="dynamicTable">
+					<thead>
+						<tr>
+							<th width="30" align="center">序号</th>
+							<th align="center">审批角色、人员</th>
+							<th align="center">审批方式</th>
+							<th align="center">驳回是否继续</th>
+						</tr>
+					</thead>
+					<tbody>
+              <% if(has(auditItemList) && auditItemList != null){ for(i in auditItemList) {%>
+	                 <tr id="line${iLP.index}">
+				        <td align="center">${iLP.index}</td>
+			            <td align="center">
+			            	${isEmpty(i.choiceRole)?'':i.choiceRole.roleName+'（角色）'}
+			            	${isEmpty(i.choiceNames)?'':i.choiceNames+'（账户）'}
+			            </td>
+			            <td align="center">
+			            	${i.attendName}
+			            </td>
+			            <td align="center">
+			            	${i.continueFlag?'是':'否'}
+			            </td>
+			        </tr>
+              <%}}%>
+					</tbody>
+				</table>				
+			</div>
+		</div>
+	</form>
+</div>
+</body>
+<script>
+	layui.use(['form'], function(){
+        var form  = layui.form;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+</script>
+</html>

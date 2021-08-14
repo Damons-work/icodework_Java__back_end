@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<head>
+  <title>Excel生成并下载示例</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<%
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+	<form id="f" class="layui-form" onsubmit="return false" action="##" method="post">
+	<%if(has(fileName) && fileName != null) {%>
+	Excel文件已经生成      
+      <a href="../common/download?file=${fileName}&name=demo.xls">下载</a>
+     <%} else {%>
+     Excel文件生成失败！
+     <%}%>
+</div>
+</body>
+</html>

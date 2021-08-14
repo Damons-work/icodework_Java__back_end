@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<script language="JavaScript">
+	// 获取根域名
+var arr = location.hostname.split('.');
+while(arr.length > 2) {
+	arr = arr.slice(1);
+	try {
+		// 设置根域名为document.domain
+		document.domain = arr.join('.');
+	} catch (e) {}
+}
+
+// category：分类
+function onCategoryClick(category) {	
+	var ifr = document.getElementById("listFrame");	
+	// 将moduleFlag传递给左边的frame	
+	if(ifr.document) {
+		// ie
+		ifr = ifr.contentWindow;
+	} else {
+		//
+		ifr = ifr.contentWindow;
+	}
+	
+	ifr.listItem(category);
+}
+</script>
+</head>
+
+<frameset rows="*" cols="220,*" frameborder="no" id="myFrame" name="myFrame">
+  <frame src="../config/categorySelect.do" frameborder="0" noresize></frame>
+  <frame id="listFrame" name="listFrame" src="../config/itemList.do" frameborder="0"></frame>
+</frameset>
+<noframes><body class="panel-body">
+</body></noframes>
+</html>

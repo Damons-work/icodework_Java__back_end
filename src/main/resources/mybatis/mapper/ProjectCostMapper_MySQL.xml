@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.project.mapper.ProjectCostMapper">
+	<!-- 数据映射 -->
+	<resultMap id="projectCostMap" type="cn.js.icode.project.entity.ProjectCost">
+		<id property="id" column="cost_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="yearMonth" column="yearMonth"/>
+		<result property="personId" column="person_id"/>
+		<result property="toDay" column="to_day"/>
+		<result property="personCost" column="person_cost"/>
+		
+		<!-- 对象数据嵌套 -->
+		<association property="person" javaType="cn.js.icode.project.entity.Person">
+			<id property="id" column="person_id"/>
+			<result property="personName" column="person_name"/>
+			<result property="cost" column="cost"/>
+		</association>
+	</resultMap>
+    <!-- 查询项目成本 -->
+    <!-- 查询单条项目成本 -->
+    <select id="getObject" resultMap="projectCostMap">
+        SELECT
+        T1.cost_id, T1.project_id, T1.yearMonth, T1.person_id, T1.to_day, T1.person_cost,
+        T2.person_name, T2.cost
+        FROM project_project_cost T1 left join project_person_base T2 on T1.person_id = T2.person_id
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.cost_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND T1.project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.yearMonth != null">
+                        AND T1.yearMonth = #{where.yearMonth}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND T1.person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.toDay != null">
+                        AND T1.to_day = #{where.toDay}
+                    </if>
+	
+                    <if test="where != null and where.personCost != null">
+                        AND T1.person_cost = #{where.personCost}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		ORDER BY T1.cost_id DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条项目成本 -->
+    <select id="list" resultMap="projectCostMap">
+        SELECT
+        T1.cost_id, T1.project_id, T1.yearMonth, T1.person_id, T1.to_day, T1.person_cost,
+        T2.person_name, T2.cost
+        FROM project_project_cost T1 left join project_person_base T2 on T1.person_id = T2.person_id
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.cost_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND T1.project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.yearMonth != null">
+                        AND T1.yearMonth = #{where.yearMonth}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND T1.person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.toDay != null">
+                        AND T1.to_day = #{where.toDay}
+                    </if>
+	
+                    <if test="where != null and where.personCost != null">
+                        AND T1.person_cost = #{where.personCost}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		<if test="pagination == null or pagination.dataSort == null or pagination.dataSort.fieldName == null">
+			ORDER BY T1.cost_id DESC
+        </if>
+        <if test="pagination != null and pagination.dataSort != null and pagination.dataSort.fieldName != null">
+			ORDER BY ${pagination.dataSort.fieldName}
+			<if test="pagination.dataSort.direction == 1">ASC</if>
+			<if test="pagination.dataSort.direction == -1">DESC</if>
+        </if>
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM project_project_cost
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    cost_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.yearMonth != null">
+                        AND yearMonth = #{where.yearMonth}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.toDay != null">
+                        AND to_day = #{where.toDay}
+                    </if>
+	
+                    <if test="where != null and where.personCost != null">
+                        AND person_cost = #{where.personCost}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增项目成本 -->
+
+    <insert id="insert" parameterType="cn.js.icode.project.entity.ProjectCost" useGeneratedKeys="true" keyProperty="data.id">
+
+        INSERT INTO project_project_cost(cost_id, project_id, yearMonth, person_id, to_day, person_cost)
+        VALUES (
+        #{data.id}, 
+
+		#{data.projectId}, 
+	
+		#{data.yearMonth}, 
+	
+		#{data.personId}, 
+	
+		#{data.toDay}, 
+	
+		#{data.personCost}
+	
+        )
+    </insert>
+
+    <!-- 修改项目成本 -->
+    <update id="update">
+        UPDATE project_project_cost
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                cost_id = #{data.id},
+            </if>
+		
+			<if test="data.projectId != null">
+				project_id = #{data.projectId},
+			</if>
+	
+			<if test="data.yearMonth != null">
+				yearMonth = #{data.yearMonth},
+			</if>
+	
+			<if test="data.personId != null">
+				person_id = #{data.personId},
+			</if>
+	
+			<if test="data.toDay != null">
+				to_day = #{data.toDay},
+			</if>
+	
+			<if test="data.personCost != null">
+				person_cost = #{data.personCost},
+			</if>
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    cost_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.yearMonth != null">
+                        AND yearMonth = #{where.yearMonth}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.toDay != null">
+                        AND to_day = #{where.toDay}
+                    </if>
+	
+                    <if test="where != null and where.personCost != null">
+                        AND person_cost = #{where.personCost}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除项目成本 -->
+    <delete id="delete">
+        DELETE FROM project_project_cost
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    cost_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND project_id = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.yearMonth != null">
+                        AND yearMonth = #{where.yearMonth}
+                    </if>
+	
+                    <if test="where != null and where.personId != null">
+                        AND person_id = #{where.personId}
+                    </if>
+	
+                    <if test="where != null and where.toDay != null">
+                        AND to_day = #{where.toDay}
+                    </if>
+	
+                    <if test="where != null and where.personCost != null">
+                        AND person_cost = #{where.personCost}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

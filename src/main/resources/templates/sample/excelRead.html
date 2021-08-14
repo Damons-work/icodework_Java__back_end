@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<head>
+  <title>Excel上传并读取示例</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<%
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+	<form id="f" class="layui-form" onsubmit="excelRead.do" action="##" method="post">
+		Excel文件上传示例
+		<br/><br/>
+		
+	   <!-- 上传组件外层必须包一层div，内含2个div，一个用于展示已上传文件，另一个构造上传组件 -->
+       <div class="layui-upload-drag" id="uploadDiv">
+         <i class="layui-icon"></i>
+         <p>点击上传.xls文件，或将文件拖拽到此处</p>
+       </div>
+        
+       <!-- 下面的控件名称不可以使用 file ，因为上面的layui上传组件也会创建一个控件名称为 file -->
+       <input type="hidden" name="fileName"/>
+	</form>
+	
+	<%if(has(rowDataList) && rowDataList != null) {%>         
+            <table class="layui-table">
+              <tbody>
+            <% for(row in rowDataList) {%>
+                <tr>
+                  <%for(cell in row) {%>
+				  <td>${cell}</td>
+				  <%}%>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+     <%}%>
+</div>
+</body>
+<script>
+	layui.use('upload', function(){
+		var upload = layui.upload;		
+
+		// 上传文件
+		// accept：指定允许上传时校验的文件类型，可选值有：images（图片）、file（所有文件）、video（视频）、audio（音频）
+		upload.render({
+			elem: '#uploadDiv',
+			url: '../common/upload',
+			accept: 'file',
+			exts: 'xls', // 扩展名限定.xls文件
+			done: function(res){
+				if(res == null || res.statusCode != 200) {
+					return;
+				}
+				
+				// 返回上传后的文件地址
+				var url = res.data;
+				
+				// 使用上传后的文件地址
+				// 显示上传的文件
+				if(url.indexOf("http://") == 0 || url.indexOf("https://") == 0) {
+					$(this.elem).after('<div><a href="' + url + '">点击下载</a> &nbsp; <a class="layui-btn layui-btn-xs demo-reload deletexs">删除</a></div>');	
+				} else {
+					$(this.elem).after('<div><a href="../common/download?file=' + url + '">点击下载</a> &nbsp; <a class="layui-btn layui-btn-xs demo-reload deletexs">删除</a></div>');	
+				}
+				
+				// 隐藏上传对话框
+				$(this.elem).css('display', 'none');
+
+				if(confirm("上传后的文件地址是：\n" + url + "\n\n确认要提交解析吗？")) {
+					// 表单中的控件名称不可以使用 file ，因为上面的layui上传组件也会创建一个控件名称为 file
+					document.forms[0]["fileName"].value = url;
+					document.forms[0].submit();
+				}
+			}
+		});
+	});
+	
+	// 设置删除按钮触发
+	$(document).on("click",".deletexs",function(){
+		// 显示当前父节点的前面元素
+		$(this).parent().prev().css('display', '');
+		$(this).parent().remove();
+	});
+</script>
+</html>

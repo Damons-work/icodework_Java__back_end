@@ -1,0 +1,190 @@
+﻿<!DOCTYPE html>
+<!-- 
+	可选参数：
+	isPublic （可选，默认为false）
+	    true: 选取所有组织机构节点并形成为树
+	    false: 选取当前用户有权限的组织机构节点并形成为树。
+	    
+	excludeIds : 排除在外的节点ID（可选），包括子节点都会被排除掉。多个节点ID，使用半角逗号间隔
+-->
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}    
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" action="organizationSelect.do" method="post" onsubmit="return false">
+	  <input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+	  <input type="hidden" name="multiple" value="${parameter.multiple}"/>
+	  <input type="hidden" name="isPublic" value="${parameter.isPublic}"/>
+	  <input type="hidden" name="excludeIds" value="${parameter.excludeIds}"/>
+      <input type="hidden" name="organization.parentId" value="${organization.parentId}"/>
+      
+      <div class="layui-card">
+        <div class="layui-card-body">
+
+            <div class="layui-form-item">
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">类型：</label>
+                    <div class="layui-input-inline">
+						<select name="organization.typeFlag" style="width:150px" onchange="changeQuery();">
+							<option value="">--请选择--</option>
+							<% if(has(typeList) && typeList != null) { for(i in typeList) {%>
+							<option value="${i.key}"<% if(organization.typeFlag == i.key) {%> selected<%}%>>${i.value}</option>
+							<%}}%>
+						</select>
+					</div>
+                </div>
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">组织编码：</label>
+                    <div class="layui-input-inline">
+						<input type="text" id="orgCode" name="organization.organizationCode" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(organization.organizationCode)}"
+							   class="layui-input" style="width:158px" maxlength="5" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">组织名称：</label>
+                    <div class="layui-input-inline">
+						<input type="text" id="orgName" name="organization.organizationName" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(organization.organizationName)}"
+								class="layui-input" style="width:158px" maxlength="50" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+                
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+					<a class="layui-btn" onclick="onSelected();"><i class="layui-icon layui-icon-ok"></i> 确定选择</a>
+					<a class="layui-btn layui-btn-warm" onclick="onClear();"><i class="layui-icon layui-icon-circle"></i> 清除选择</a>
+                </div>
+            </div>
+
+			<div class="layui-inline">
+				<label class="layui-form-label">父级组织：</label>
+				<div class="layui-input-inline layui-form-mid">
+					<% if(has(parents) && parents != null){ for(i in parents) {%>
+					<%if(!iLP.last) {%><a href="javascript:;" onclick="changeParent('${i.id}');" style='color: #1E9FFF;'>${i.organizationName}</a> /<%}%>
+					<%if(iLP.last) {%>${i.organizationName}<%}%>
+					<%}}%>
+				</div>
+			</div>
+			
+            <table class="layui-table" lay-data="{id:'selectTable'}">
+            <!--
+			 * ！！除非设计、指导人员有特别说明，否则此处的数据列不得随意增加、修改、删除！！
+			 * －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+			 * 
+			 * 为了页面效果，可以隐藏相关数据列。隐藏数据列，请修改相应的表头<th/>标签：
+			 * 
+			 * 修改lay-data属性，添加 hide:true，例如：
+			 *
+			 * <th lay-data="{field:'activeFlag',hide:true}"></th>
+            -->
+             <thead>
+             <tr>
+                <th class="center" lay-data="{field:'id',width:30,type:'${(!isEmpty(parameter.multiple) && parameter.multiple == 'true') ? "checkbox" : "radio"}', fixed: 'left'}">${(!isEmpty(parameter.multiple) && parameter.multiple == 'true') ? "" : "选择"}</th>
+		
+			  <th lay-data="{field:'parentId',width:120}">父级组织</th>
+			  		  
+			  <th lay-data="{field:'typeFlag',hide:true}"></th>
+			  
+			  <th class="center" lay-data="{field:'typeFlag',width:100}">类型</th>
+			  
+			  <th lay-data="{field:'organizationCode',width:120}">组织编码</th>
+			  
+			  <th lay-data="{field:'organizationName'}">组织名称</th>
+			  
+			  <th lay-data="{field:'fullName',hide:true}"></th>
+			  
+			  <th lay-data="{field:'briefName',width:120}">简称</th>
+			  
+			  <th lay-data="{field:'activeFlag',hide:true}"></th>
+			  <th lay-data="{field:'activeFlagName',hide:true}">有效标识</th>
+			  
+				<th lay-data="{field:'sonCount',width:100}">子组织</th>
+		
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(organizationList) && organizationList != null){ for(i in organizationList) {%>
+                <tr>
+	                <td>${i.id}</td>
+			
+				  <td>${i.parentId}</td>
+				  
+				  <td>${i.typeFlag}</td>
+				  <td>${i.typeName}</td>
+				  
+				  <td>${i.organizationCode}</td>
+				  
+				  <td>${i.organizationName}</td>
+				  <td>${i.fullName}</td>
+				  
+				  <td>${i.briefName}</td>
+				  
+				  <td>${i.activeFlag}</td>
+				  <td>${(i.activeFlag != null && i.activeFlag) ? "有效" : "禁用"}</td>
+				  <td><a href="javascript:;" onclick="changeParent('${i.id}');"><i class="layui-icon layui-icon-list" style='font-size: 20px; color: #1E9FFF;'></i> 进入</a></td>
+                </tr>
+                <%}}%>
+              </tbody>
+            </table>
+        </div>
+
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>    
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','table','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+
+	function changeParent(pId) {
+	    if(pId == null || $.trim(pId) == "") return;
+	    selectOption(document.forms[0]["organization.typeFlag"], "");
+	    $("#orgCode").val("");
+	    $("#orgName").val("");
+		document.forms[0]["organization.parentId"].value = pId;
+		toPage(1);
+	}
+
+	// 确定选择
+	function onSelected() {
+		//获取checkbox选中的值
+		var checkStatus = layui.table.checkStatus('selectTable');
+		var data = checkStatus.data;
+		
+		if(data == null || data.length == 0) {
+			$.message("没有选择任何数据哦！");
+			return;
+		}
+		
+		var result = {
+			"statusCode" : 100,
+			"message" : "",
+			"dto" : data
+		};
+		
+		returnDialog(result);
+	}
+
+	// 清除选择
+	function onClear() {		
+		var result = {
+			"statusCode" : 100,
+			"message" : ""
+		};
+		
+		returnDialog(result);
+	}
+</script>
+</html>

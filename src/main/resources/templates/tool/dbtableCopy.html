@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+  <script type="text/javascript" src="view.js"></script>
+  <script type="text/javascript" src="validate.js"></script>
+</head>
+<body>
+<div class="layui-fluid">
+	<form id="fAdd" class="layui-form" action="#" onsubmit="return false" method="post">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+		<input type="hidden" name="dbtable.projectId" value="${dbtable.projectId}"/>
+		<div class="layui-card">
+			<!-- 如需要header信息，放开下面的comment -->
+			<div class="layui-card-header">参数设定</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<!-- 如一行显示多列数据，参照下面的示例 -->
+				<!--
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">属性1：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">属性2：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>
+				</div>
+				-->				
+				<div class="layui-form-item">
+					<label class="layui-form-label">系统包名<span style="color:#FF5722;">*</span>：</label>
+					<div class="layui-input-block">
+						<input type="text" name="dbtable.packagePrefix" placeholder="此处仅仅具体到系统层级，如HR系统：com.xxxx.hr" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(dbtable.packagePrefix)}" autocomplete="off" class="layui-input" maxlength="50">
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-card">
+			<div class="layui-card-header">数据库表信息</div>
+			<div class="layui-card-body" style="padding: 15px;">
+			
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">表名称<span style="color:#FF5722;">*</span>：</label>
+						<div class="layui-input-inline">
+							<input type="text" name="dbtable.tableName" placeholder="规范格式：模块_实体_后缀" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(dbtable.tableName)}" autocomplete="off" class="layui-input" maxlength="50">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">表说明<span style="color:#FF5722;">*</span>：</label>
+						<div class="layui-input-inline">
+							<input type="text" name="dbtable.tableDescription" placeholder="数据表说明" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(dbtable.tableDescription)}" autocomplete="off" class="layui-input" maxlength="25">
+						</div>
+					</div>
+				</div>
+				
+				<!-- 字段定义 -->
+				<button class="layui-btn layui-btn-xs layui-btn-warm" onclick="addField(document.getElementById('dynamicTable'));">
+					<i class="layui-icon layui-icon-add-1"></i>
+					在尾部追加一个字段
+				</button>
+				<table class="layui-table" id="dynamicTable">
+					<thead>
+					<tr>
+						<th width="30" align="center">序号</th>
+						<th width="120" align="center">字段</th>
+						<th width="100" align="center">类型</th>
+						<th width="80" align="center">长度</th>
+						<th width="30" align="center">PK</th>
+						<th width="40" align="center">NotNull</th>
+						<th align="center">字段说明</th>
+						<th width="60" align="center">操作</th>
+					</tr>
+					</thead>
+					<tbody>
+					<% if(has(fieldList) && fieldList != null){ for(i in fieldList) {%>
+					<tr id="line${iLP.index}">
+						<td align="center">${iLP.index}</td>
+						<td align="center"><input type="text" name="fieldName" maxlength="50" class="layui-input" style="width:100%;" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(i.fieldName)}"></td>
+						<td align="center">
+							<select name="fieldType">
+						<% if(has(typeList) && typeList != null){ for(j in typeList) {%>
+							<option value="${j.key}"<%if(i.fieldType == j.key) {%> selected<%}%>>${j.value}</option>
+						<%}}%>
+							</select>
+						</td>
+						<td align="center"><input type="text" name="fieldLength" maxlength="10" class="layui-input" style="width:100%;" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(i.fieldLength)}"></td>
+						<td align="center"><input type="checkbox" name="pK" lay-skin="primary" value="true"<%if(i.isPk) {%> checked<%}%>><input type="hidden" name="pKValue" value="${i.isPk}"/></td>
+						<td align="center"><input type="checkbox" name="notNull" lay-skin="primary" value="true"<%if(i.isNotNull) {%> checked<%}%>><input type="hidden" name="notNullValue" value="${i.isNotNull}"/></td>
+						<td><input type="text" name="fieldDescription" maxlength="100" class="layui-input" style="width:100%;" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(i.fieldDescription)}"></td>
+						<td align="center">
+						<i class="layui-icon layui-icon-add-1" title="在下面添加一行" onclick='addField(document.getElementById("dynamicTable"), "line${iLP.index}");' style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;"></i>
+						<i class='layui-icon layui-icon-delete' title="删除" onclick='deleteField(document.getElementById("dynamicTable"), "line${iLP.index}");' style='font-size: 20px; color: #1E9FFF;'></i>
+						</td>
+					</tr>
+					<%}}%>
+					</tbody>
+				</table>
+				<button class="layui-btn layui-btn-xs layui-btn-warm" onclick="addField(document.getElementById('dynamicTable'));">
+					<i class="layui-icon layui-icon-add-1"></i>
+					在尾部追加一个字段
+				</button>
+			</div>
+		</div>
+
+		<div class="layui-form-item layui-layout-admin">
+			<div class="layui-input-block">
+				<div class="layui-footer" style="left: 0;">
+					<button class="layui-btn" onclick="doAddAction('dbtable');">复 制</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        form.render();
+    });
+
+	function validate(theForm) {
+		// 注意：
+		// 如果更改页面表单的控件类型，请在校验判断时做对应修改：
+		// 1. 下拉框：使用 $.trim(theForm["控件名称"].value) == ""
+		// 2. 单选框/复选框：使用 getChoiceValue("控件名称") == null
+		//		
+		return checkInput(theForm);
+	}
+
+	// 行增长的序号
+	// 字段序号，在此重新赋值
+	nLineIndex = ${has(fieldList) ? fieldList.~size : 0};
+	// 字段类型的HTML字符串，在此重新赋值
+	typeString = '<select name="fieldType">' +
+		<% if(has(typeList) && typeList != null){ for(i in typeList) {%>
+			'<option value="${i.key}">${i.value}</option>' +
+		<%}}%>
+			'</select>';
+</script>
+</body>
+</html>

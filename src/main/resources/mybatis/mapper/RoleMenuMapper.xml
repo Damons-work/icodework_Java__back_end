@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.system.mapper.RoleMenuMapper">
+    <!-- 查询角色管理的菜单项信息 -->
+    <!-- 查询单条角色管理的菜单项信息 -->
+    <select id="getObject" resultType="cn.js.icode.system.data.RoleMenu">
+        SELECT
+        Id, RoleId, MenuId, PermissionFlag
+        FROM system_role_menu
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.roleId != null">
+                        AND RoleId = #{where.roleId}
+                    </if>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.permissionFlag != null">
+                        AND PermissionFlag = #{where.permissionFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY Id DESC limit 0, 1
+    </select>
+    <!-- 查询多条角色管理的菜单项信息 -->
+    <select id="list" resultType="cn.js.icode.system.data.RoleMenu">
+        SELECT
+        Id, RoleId, MenuId, PermissionFlag
+        FROM system_role_menu
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.roleId != null">
+                        AND RoleId = #{where.roleId}
+                    </if>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.permissionFlag != null">
+                        AND PermissionFlag = #{where.permissionFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY Id DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM system_role_menu
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.roleId != null">
+                        AND RoleId = #{where.roleId}
+                    </if>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.permissionFlag != null">
+                        AND PermissionFlag = #{where.permissionFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO system_role_menu(Id, RoleId, MenuId, PermissionFlag)
+        VALUES (
+        #{data.id},
+		#{data.roleId},
+		#{data.menuId},
+		#{data.permissionFlag}
+        )
+    </insert>
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE system_role_menu
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="data.id != null">
+                Id = #{data.id},
+            </if>
+			<if test="data.roleId != null">
+				RoleId = #{data.roleId},
+			</if>
+			<if test="data.menuId != null">
+				MenuId = #{data.menuId},
+			</if>
+			<if test="data.permissionFlag != null">
+				PermissionFlag = #{data.permissionFlag},
+			</if>
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.roleId != null">
+                        AND RoleId = #{where.roleId}
+                    </if>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.permissionFlag != null">
+                        AND PermissionFlag = #{where.permissionFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+    <!-- 删除角色管理的菜单项信息 -->
+    <delete id="delete">
+        DELETE FROM system_role_menu
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.roleId != null">
+                        AND RoleId = #{where.roleId}
+                    </if>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.permissionFlag != null">
+                        AND PermissionFlag = #{where.permissionFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

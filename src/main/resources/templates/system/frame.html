@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>${@team.bangbang.common.config.Config.getProperty("spring.application.name")}</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<%
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body class="layui-layout-body">
+  
+  <div id="LAY_app">
+    <div class="layui-layout layui-layout-admin">
+      <div class="layui-header">
+        <!-- 头部区域 -->
+        <ul class="layui-nav layui-layout-left">
+          <li class="layui-nav-item layadmin-flexible" lay-unselect>
+            <a href="javascript:;" layadmin-event="flexible" title="侧边伸缩">
+              <i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>
+            </a>
+          </li>
+          <li class="layui-nav-item" lay-unselect>
+            <a href="javascript:;" layadmin-event="refresh" title="刷新">
+              <i class="layui-icon layui-icon-refresh-3"></i>
+            </a>
+          </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
+          <li class="layui-nav-item layui-hide-xs" lay-unselect>
+            <a href="javascript:;" layadmin-event="theme">
+              <i class="layui-icon layui-icon-theme"></i>
+            </a>
+          </li>
+          <li class="layui-nav-item layui-hide-xs" lay-unselect>
+            <a href="javascript:;" layadmin-event="fullscreen">
+              <i class="layui-icon layui-icon-screen-full"></i>
+            </a>
+          </li>
+          <li class="layui-nav-item" lay-unselect>
+            <a href="javascript:;">
+              <cite>${@team.bangbang.common.utility.LogicUtility.getHTMLString(account.name)}</cite>
+            </a>
+            <dl class="layui-nav-child">
+              <dd><a lay-href="../system/myAccountView.do">我的账号</a></dd>
+              <dd><a lay-href="../system/passwordUpdate.do">修改密码</a></dd>
+              <hr>
+              <dd style="text-align: center;"><a href="javascript:$.confirm('确认要退出系统吗？', function() {top.location.replace('../system/logout.do');});">退出</a></dd>
+            </dl>
+          </li>
+		<%if(has(setting)) {%>
+          <li class="layui-nav-item layui-hide-xs" lay-unselect style="margin-right:20px;">
+            <a href="javascript:;">设置</a>
+            <dl class="layui-nav-child">
+            <% for(i in setting) {%>
+              <dd><a lay-href="${i.attributes['MENU_URL']}">${i.name}</a></dd>
+            <%}%>
+            </dl>
+          </li>
+		<%}%>
+          <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-unselect>
+            <a href="javascript:;" layadmin-event="more"><i class="layui-icon layui-icon-more-vertical"></i></a>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- 侧边菜单 -->
+      <div class="layui-side layui-side-menu">
+        <div class="layui-side-scroll">
+          <div class="layui-logo" lay-href="../help/readme.html">
+            <span>${@team.bangbang.common.config.Config.getProperty("spring.application.name")}</span>
+          </div>
+          
+          <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
+            <% if(has(menuHtml)) {%>${menuHtml}<%}%>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 页面标签 -->
+      <div class="layadmin-pagetabs" id="LAY_app_tabs">
+        <div class="layui-icon layadmin-tabs-control layui-icon-prev" layadmin-event="leftPage"></div>
+        <div class="layui-icon layadmin-tabs-control layui-icon-next" layadmin-event="rightPage"></div>
+        <div class="layui-icon layadmin-tabs-control layui-icon-down">
+          <ul class="layui-nav layadmin-tabs-select" lay-filter="layadmin-pagetabs-nav">
+            <li class="layui-nav-item" lay-unselect>
+              <a href="javascript:;"></a>
+              <dl class="layui-nav-child layui-anim-fadein">
+                <dd layadmin-event="closeThisTabs"><a href="javascript:;">关闭当前标签页</a></dd>
+                <dd layadmin-event="closeOtherTabs"><a href="javascript:;">关闭其它标签页</a></dd>
+                <dd layadmin-event="closeAllTabs"><a href="javascript:;">关闭全部标签页</a></dd>
+              </dl>
+            </li>
+          </ul>
+        </div>
+        <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
+          <ul class="layui-tab-title" id="LAY_app_tabsheader">
+            <li lay-id="welcome-page" lay-attr="${isEmpty(account.welcomePage)?'../help/readme.html':account.welcomePage}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 主体内容 -->
+      <div class="layui-body" id="LAY_app_body">
+        <div class="layadmin-tabsbody-item layui-show">
+          <iframe src="${isEmpty(account.welcomePage)?'../help/readme.html':account.welcomePage}" frameborder="0" class="layadmin-iframe"></iframe>
+        </div>
+      </div>
+      
+      <!-- 辅助元素，一般用于移动设备下遮罩 -->
+      <div class="layadmin-body-shade" layadmin-event="shade"></div>
+    </div>
+  </div>
+
+  <script src="../layuiadmin/layui/layui.js"></script>
+  <script>
+  layui.config({
+    base: '../layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'layer', 'admin'], function(){
+      var layer = layui.layer;
+      var admin = layui.admin;
+      //admin.sideFlexible(null);
+  });
+  
+  // setData(name, value) getData(name) 用于保存子页面的临时变量
+  var _data = new Array();
+  function setData(name, value) {
+      _data[name] = value;
+  }
+
+  function getData(name) {
+      return _data[name];
+  }
+
+  // 告警消息[{num, message, link}]
+  var messageList = [];
+  // 告警框index
+  var warningDialogIndex;
+  // 告警框方法
+  function showWarning(messageList) {
+      if (messageList != null && messageList.length > 0) {
+          if (warningDialogIndex != null) {
+              layer.close(warningDialogIndex);
+          }
+
+          var htmlStr = '<div style="min-width:300px;min-height:80px;padding:10px 20px;font-size: 15px;color:black;background-color: #fbf7f7;"><ul>';
+          messageList.map(function(item, index) {
+              console.log(item.menu);
+              var message = item.tip.replace(/\{count\}/g, item.count);
+              htmlStr += '<li style="line-height: 34px"><a onmouseover="this.style.color=\'red\'" onmouseout="this.style.color=\'black\'" lay-href="'
+                  + ((item.menu != null && item.menu.menuUrl != null) ? item.menu.menuUrl : '')
+                  + '" title="' + message + '"lay-text="' + ((item.menu != null && item.menu.menuName != null) ? item.menu.menuName : '') + '">'
+                  + (message && message.length > 22 ? message.substr(0, 22) + "..." : message)
+                  + '</a></li>';
+
+          });
+          htmlStr += '</ul></div>';
+          warningDialogIndex
+              = layer.open({
+              title: ['<span><i class="layui-icon">&#xe667;</i> 预 警 提 示</span>', 'background-color: #ff7f00;color: white;'],
+              type: 1,
+              offset: 'rb',
+              shade: 0,
+              content: htmlStr
+          });
+      }
+      return;
+  }
+
+  /* 告警消息重复校验 */
+  function validateUnique(newMessageList) {
+      if (newMessageList == null || newMessageList.length <= 0) {
+          messageList = newMessageList;
+          return false;
+      }
+      if (messageList == null || newMessageList.length <= 0) {
+          return true;
+      }
+      if (messageList.length != newMessageList.length) {
+          messageList = newMessageList;
+          return false;
+      }
+      for (var i = 0; i < newMessageList.length; i++) {
+          var newMessage = newMessageList[i];
+          // 是否在旧的列表中,在则继续遍历,不在立即返回
+          if (!isInMessageList(newMessage)) {
+              messageList = newMessageList;
+              return false;
+          }
+      }
+      return true;
+  }
+
+  /* 判断告警消息是否在messageList中 */
+  function isInMessageList(newMessage) {
+
+      for (var j = 0; j < messageList.length; j++) {
+          var message = messageList[j];
+          if (newMessage.messageId == message.messageId
+              && newMessage.count == message.count) {
+              return true;
+          }
+      }
+      return false;
+  }
+
+  // 告警框入口
+  var getWarning = setInterval(function() {
+      $.ajax({
+          url: "../common/warningView.do",
+          dataType: 'text',
+          success:function(result) {
+              if (result != null) {
+                  var newMessageList = JSON.parse(result);
+                  if (validateUnique(newMessageList)) {
+                      return;
+                  }
+                  showWarning(newMessageList);
+              }
+          }
+      });
+  }, 10000);
+  </script>
+</body>
+</html>
+
+

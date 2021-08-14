@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.system.mapper.UserMapper">
+    <!-- 查询系统账户信息 -->
+    <!-- 查询单条系统账户信息 -->
+    <select id="getObject" resultType="cn.js.icode.system.data.User">
+        SELECT
+        UserId, PartnerId, Email, Password, UserName, OrganizationId, ActiveFlag
+        FROM system_user_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    UserId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerId != null and where.partnerId != ''">
+                        AND PartnerId = #{where.partnerId}
+                    </if>
+	
+                    <if test="where != null and where.email != null and where.email != ''">
+                        AND Email = #{where.email}
+                    </if>
+	
+                    <if test="where != null and where.password != null and where.password != ''">
+                        AND Password = #{where.password}
+                    </if>
+	
+                    <if test="where != null and where.userName != null and where.userName != ''">
+                        AND UserName = #{where.userName}
+                    </if>
+	
+                    <if test="where != null and where.organizationId != null">
+                        AND OrganizationId = #{where.organizationId}
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY UserId DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条系统账户信息 -->
+    <select id="list" resultType="cn.js.icode.system.data.User">
+        SELECT
+        UserId, PartnerId, Email, Password, UserName, OrganizationId, ActiveFlag
+        FROM system_user_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    UserId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerId != null and where.partnerId != ''">
+                        AND PartnerId like concat('%', #{where.partnerId}, '%')
+                    </if>
+	
+                    <if test="where != null and where.email != null and where.email != ''">
+                        AND Email like concat('%', #{where.email}, '%')
+                    </if>
+	
+                    <if test="where != null and where.password != null and where.password != ''">
+                        AND Password like concat('%', #{where.password}, '%')
+                    </if>
+	
+                    <if test="where != null and where.userName != null and where.userName != ''">
+                        AND UserName like concat('%', #{where.userName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.organizationId != null">
+                        AND OrganizationId = #{where.organizationId}
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY UserId DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM system_user_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    UserId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerId != null and where.partnerId != ''">
+                        AND PartnerId like concat('%', #{where.partnerId}, '%')
+                    </if>
+	
+                    <if test="where != null and where.email != null and where.email != ''">
+                        AND Email like concat('%', #{where.email}, '%')
+                    </if>
+	
+                    <if test="where != null and where.password != null and where.password != ''">
+                        AND Password like concat('%', #{where.password}, '%')
+                    </if>
+	
+                    <if test="where != null and where.userName != null and where.userName != ''">
+                        AND UserName like concat('%', #{where.userName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.organizationId != null">
+                        AND OrganizationId = #{where.organizationId}
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO system_user_base(UserId, PartnerId, Email, Password, UserName, OrganizationId, ActiveFlag, UpdateTime)
+        VALUES (
+        #{data.id}, 
+
+		#{data.partnerId}, 
+	
+		#{data.email}, 
+	
+		#{data.password}, 
+	
+		#{data.userName}, 
+	
+		#{data.organizationId}, 
+	
+		<if test="data.activeFlag == null">null</if>
+		<if test="data.activeFlag != null and data.activeFlag">1</if>
+		<if test="data.activeFlag != null and !data.activeFlag">0</if>,
+		now()
+	
+        )
+    </insert>
+
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE system_user_base
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                UserId = #{data.id},
+            </if>
+		
+			<if test="data.partnerId != null">
+				PartnerId = #{data.partnerId},
+			</if>
+	
+			<if test="data.email != null">
+				Email = #{data.email},
+			</if>
+	
+			<if test="data.password != null and where.password != ''">
+				Password = #{data.password},
+			</if>
+	
+			<if test="data.userName != null">
+				UserName = #{data.userName},
+			</if>
+	
+			OrganizationId = #{data.organizationId},
+	
+			<if test="data.activeFlag != null and data.activeFlag">
+				ActiveFlag = 1,
+			</if>
+			<if test="data.activeFlag != null and !data.activeFlag">
+				ActiveFlag = 0,
+			</if>
+	
+			UpdateTime = now()
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    UserId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerId != null">
+                        AND PartnerId = #{where.partnerId}
+                    </if>
+	
+                    <if test="where != null and where.email != null">
+                        AND Email = #{where.email}
+                    </if>
+	
+                    <if test="where != null and where.password != null and where.password != ''">
+                        AND Password = #{where.password}
+                    </if>
+	
+                    <if test="where != null and where.userName != null">
+                        AND UserName = #{where.userName}
+                    </if>
+	
+                    <if test="where != null and where.organizationId != null">
+                        AND OrganizationId = #{where.organizationId}
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除系统账户信息 -->
+    <delete id="delete">
+        DELETE FROM system_user_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    UserId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.partnerId != null">
+                        AND PartnerId = #{where.partnerId}
+                    </if>
+	
+                    <if test="where != null and where.email != null">
+                        AND Email = #{where.email}
+                    </if>
+	
+                    <if test="where != null and where.password != null and where.password != ''">
+                        AND Password = #{where.password}
+                    </if>
+	
+                    <if test="where != null and where.userName != null">
+                        AND UserName = #{where.userName}
+                    </if>
+	
+                    <if test="where != null and where.organizationId != null">
+                        AND OrganizationId = #{where.organizationId}
+                    </if>
+	
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

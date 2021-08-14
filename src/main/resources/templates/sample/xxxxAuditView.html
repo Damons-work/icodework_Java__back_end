@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}    
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+	<form id="fAudit" class="layui-form" onsubmit="return false" action="#">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+		
+  		<div class="layui-card">
+  			<p style="color:red;">[在当前页面上部填充申请单据摘要信息]</p>
+		</div>
+		
+		<!-- 审批任务列表，可以看到审批进行到哪一步 -->
+		${auditTaskHtml}
+		
+	</form>
+</div>
+</body>
+<script>
+	layui.use(['form'], function(){
+        var form  = layui.form;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+</script>
+</html>

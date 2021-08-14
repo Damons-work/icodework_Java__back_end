@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+	<form id="fView" class="layui-form" onsubmit="return false" action="##">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+		<div class="layui-card">
+			<div class="layui-card-header">基础信息</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<!-- 如一行显示多列数据，参照下面的示例 -->
+				<!--
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">属性1：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>对应控件
+					<div class="layui-inline">
+						<label class="layui-form-label">属性2：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>
+				</div>
+				-->
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">账户名称：</label>
+						<div class="layui-input-inline layui-form-mid">${@team.bangbang.common.utility.LogicUtility.getHTMLString(user.userName)}</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">有效标识：</label>
+						<div class="layui-input-inline layui-form-mid">
+							<% if(user.activeFlag != null && user.activeFlag) {%>有效<%}%>
+							<% if(user.activeFlag == null || !user.activeFlag) {%>禁用<%}%>
+						</div>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">电子信箱：</label>
+						<div class="layui-input-inline layui-form-mid">${@team.bangbang.common.utility.LogicUtility.getHTMLString(user.email)}</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">登录密码：</label>
+						<div class="layui-input-inline layui-form-mid">(⊙o⊙)看密码？是不可能的！</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">所属商户：</label>
+					<div class="layui-input-block layui-form-mid"">
+					${isEmpty(user.partner)?'运营商':user.partner.partnerName}
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">所在组织：</label>
+					<div class="layui-input-block layui-form-mid"">
+						<%if(isNotEmpty(user.organization)) {%>${user.organization.fullName}<%}%>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="layui-card">
+			<div class="layui-card-header">角色信息</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<table width="95%" border="0">
+					<tr>
+						<td>${roleForView}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<div class="layui-card">
+			<div class="layui-card-header">管理范围</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<table width="100%" border="0" id="dynamicTable">
+              <% if(has(organizationList) && organizationList != null){ for(i in organizationList) {%>
+                 <tr>
+			        <td>${i.fullName}</td>
+		        </tr>
+              <%}}%>
+				</table>
+			</div>
+		</div>
+	</form>
+</div>
+</body>
+<script>
+	layui.use(['form'], function(){
+        var form  = layui.form;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+</script>
+</html>

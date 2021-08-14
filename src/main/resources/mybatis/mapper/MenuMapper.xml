@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.system.mapper.MenuMapper">
+    <!-- 查询菜单项信息 -->
+    <!-- 查询单条菜单项信息 -->
+    <select id="getObject" resultType="cn.js.icode.system.data.Menu">
+        SELECT
+        MenuId, ParentId, MenuName, IconImage, OrderBy, MenuUrl, HelpUrl, ApiUrl
+        FROM system_menu_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    MenuId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.menuName != null and where.menuName != ''">
+                        AND MenuName = #{where.menuName}
+                    </if>
+                    <if test="where != null and where.iconImage != null and where.iconImage != ''">
+                        AND IconImage = #{where.iconImage}
+                    </if>
+                    <if test="where != null and where.orderBy != null and where.orderBy != ''">
+                        AND OrderBy = #{where.orderBy}
+                    </if>
+                    <if test="where != null and where.menuUrl != null and where.menuUrl != ''">
+                        AND MenuUrl = #{where.menuUrl}
+                    </if>
+                    <if test="where != null and where.helpUrl != null and where.helpUrl != ''">
+                        AND HelpUrl = #{where.helpUrl}
+                    </if>
+                    <if test="where != null and where.apiUrl != null and where.apiUrl != ''">
+                        AND ApiUrl = #{where.apiUrl}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY OrderBy limit 0, 1
+    </select>
+    <!-- 查询多条菜单项信息 -->
+    <select id="list" resultType="cn.js.icode.system.data.Menu">
+        SELECT
+        MenuId, ParentId, MenuName, IconImage, OrderBy, MenuUrl, HelpUrl, ApiUrl
+        FROM system_menu_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    MenuId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.menuName != null and where.menuName != ''">
+                        AND MenuName like concat('%', #{where.menuName}, '%')
+                    </if>
+                    <if test="where != null and where.iconImage != null and where.iconImage != ''">
+                        AND IconImage like concat('%', #{where.iconImage}, '%')
+                    </if>
+                    <if test="where != null and where.orderBy != null and where.orderBy != ''">
+                        AND OrderBy like concat('%', #{where.orderBy}, '%')
+                    </if>
+                    <if test="where != null and where.menuUrl != null and where.menuUrl != ''">
+                        AND MenuUrl like concat('%', #{where.menuUrl}, '%')
+                    </if>
+                    <if test="where != null and where.helpUrl != null and where.helpUrl != ''">
+                        AND HelpUrl like concat('%', #{where.helpUrl}, '%')
+                    </if>
+                    <if test="where != null and where.apiUrl != null and where.apiUrl != ''">
+                        AND ApiUrl like concat('%', #{where.apiUrl}, '%')
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY OrderBy
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM system_menu_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    MenuId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.menuName != null and where.menuName != ''">
+                        AND MenuName like concat('%', #{where.menuName}, '%')
+                    </if>
+                    <if test="where != null and where.iconImage != null and where.iconImage != ''">
+                        AND IconImage like concat('%', #{where.iconImage}, '%')
+                    </if>
+                    <if test="where != null and where.orderBy != null and where.orderBy != ''">
+                        AND OrderBy like concat('%', #{where.orderBy}, '%')
+                    </if>
+                    <if test="where != null and where.menuUrl != null and where.menuUrl != ''">
+                        AND MenuUrl like concat('%', #{where.menuUrl}, '%')
+                    </if>
+                    <if test="where != null and where.helpUrl != null and where.helpUrl != ''">
+                        AND HelpUrl like concat('%', #{where.helpUrl}, '%')
+                    </if>
+                    <if test="where != null and where.apiUrl != null and where.apiUrl != ''">
+                        AND ApiUrl like concat('%', #{where.apiUrl}, '%')
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO system_menu_base(MenuId, ParentId, MenuName, IconImage, OrderBy, MenuUrl, HelpUrl, ApiUrl)
+        VALUES (
+        #{data.id},
+		#{data.parentId},
+		#{data.menuName},
+		#{data.iconImage},
+		#{data.orderBy},
+		#{data.menuUrl},
+		#{data.helpUrl},
+		#{data.apiUrl}
+        )
+    </insert>
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE system_menu_base
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="data.id != null">
+                MenuId = #{data.id},
+            </if>
+			ParentId = #{data.parentId},
+			<if test="data.menuName != null">
+				MenuName = #{data.menuName},
+			</if>
+			<if test="data.iconImage != null">
+				IconImage = #{data.iconImage},
+			</if>
+			<if test="data.orderBy != null">
+				OrderBy = #{data.orderBy},
+			</if>
+			<if test="data.menuUrl != null">
+				MenuUrl = #{data.menuUrl},
+			</if>
+			<if test="data.helpUrl != null">
+				HelpUrl = #{data.helpUrl},
+			</if>
+			<if test="data.apiUrl != null">
+				ApiUrl = #{data.apiUrl},
+			</if>
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    MenuId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.menuName != null">
+                        AND MenuName = #{where.menuName}
+                    </if>
+                    <if test="where != null and where.iconImage != null">
+                        AND IconImage = #{where.iconImage}
+                    </if>
+                    <if test="where != null and where.orderBy != null">
+                        AND OrderBy = #{where.orderBy}
+                    </if>
+                    <if test="where != null and where.menuUrl != null">
+                        AND MenuUrl = #{where.menuUrl}
+                    </if>
+                    <if test="where != null and where.helpUrl != null">
+                        AND HelpUrl = #{where.helpUrl}
+                    </if>
+                    <if test="where != null and where.apiUrl != null">
+                        AND ApiUrl = #{where.apiUrl}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+    <!-- 删除菜单项信息 -->
+    <delete id="delete">
+        DELETE FROM system_menu_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    MenuId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.menuName != null">
+                        AND MenuName = #{where.menuName}
+                    </if>
+                    <if test="where != null and where.iconImage != null">
+                        AND IconImage = #{where.iconImage}
+                    </if>
+                    <if test="where != null and where.orderBy != null">
+                        AND OrderBy = #{where.orderBy}
+                    </if>
+                    <if test="where != null and where.menuUrl != null">
+                        AND MenuUrl = #{where.menuUrl}
+                    </if>
+                    <if test="where != null and where.helpUrl != null">
+                        AND HelpUrl = #{where.helpUrl}
+                    </if>
+                    <if test="where != null and where.apiUrl != null">
+                        AND ApiUrl = #{where.apiUrl}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

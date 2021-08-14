@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    
+    include("/static/include/css.html"){}
+
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" action="articleList.do" method="post" onsubmit="return false">
+      <div class="layui-card">
+        <div class="layui-card-body">
+
+            <div class="layui-form-item">
+
+				<div class="layui-inline">
+					<label class="layui-form-label">信息分类</label>
+					<div class="layui-input-inline" style="width: 150px;">
+						<select name="article.categoryCode" onchange="changeQuery();">
+							<option value="">--请选择--</option>
+							<% if(has(categoryList) && categoryList != null) { for(i in categoryList) {%>
+							<option value="${i.itemCode}"<% if(article.categoryCode == i.itemCode) {%> selected<%}%>>${i.itemName}</option>
+							<%}}%>
+						</select>
+					</div>
+				</div>
+
+				<div class="layui-inline">
+					<label class="layui-form-label">标题：</label>
+					<div class="layui-input-inline">
+						<input type="text" name="article.title" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(article.title)}"
+							    class="layui-input" style="width:150px" maxlength="100" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+				</div>
+
+
+				<div class="layui-inline">
+					<label class="layui-form-label">状态：</label>
+						<div class="layui-input-inline" style="display: inline-block; width:280px;">
+							<input type="radio" name="article.statusFlag" value="1" onchange="changeQuery();" title="待上架"<% if(article.statusFlag==1) {%> checked<%}%>/>
+
+							<input type="radio" name="article.statusFlag" value="2" onchange="changeQuery();" title="已上架"<%if(article.statusFlag==2) {%>checked<%}%>/>
+
+						</div>
+
+				</div>
+
+
+					<div class="layui-inline">
+						<a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+						<#canVisit uri="/website/articleAdd.do">
+							<a class="layui-btn layui-btn-warm" onclick="doAdd('信息发布', 'article', 1200, 900);">新增</a>
+						</#canVisit>
+					</div>
+				</div>
+
+            <table class="layui-table">
+           	  <thead>
+             	<tr>
+<!--                <th width="30" class="center">序号</th>-->
+	
+		 			 <th width="100" class="center">信息分类</th>
+		  
+<!--		 		 <th>头像图片地址</th>-->
+		  
+		 			 <th>标题</th>
+		  
+<!--		 		 <th>副标题或者摘要</th>-->
+
+					<th width="80" class="center">状态</th>
+		  
+		 			 <th>发布人</th>
+		  
+		 			 <th width="150" class="center">更新时间</th>
+	
+					<th width="80" class="center">操作</th>
+            	 </tr>
+             </thead>
+				<tbody>
+            	<% if(has(articleList) && articleList != null && !isEmpty(articleList)){ for(i in articleList) {%>
+                	<tr>
+<!--	                <td><a href="javascript:doView('信息发布', 'article', 720, 450, '${i.id}');" style="color:#01AAED;">${i.id}</a></td>-->
+			
+				 		 <td>${i.category.itemName!}</td>
+<!--					信息分类，要想将categoryCode转化成name，需要在controller中articleList.do中进行配置-->
+
+				  
+<!--				  	<td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.imageUrl)}</td>-->
+				  
+<!--				  		<td>-->
+<!--							<#canVisit uri="/website/articleView.do">-->
+<!--								<a onclick="doView('信息发布','article',900,900,'${i.id}');">${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.title)}</a>-->
+<!--							</#canVisit>-->
+
+
+						<td><a href="javascript:doView('信息发布', 'article', 1200, 900, '${i.id}');" style="color:#01AAED;">${i.title}</a></td>
+
+
+<!--				 	<td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.subTitle)}</td>-->
+				  
+				  		<td>${i.statusName}</td>
+				  
+				  		<td>${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.posterName)}</td>
+				  
+				  		<td>${i.updateTime, "yyyy-MM-dd HH:mm"}</td>
+			
+	                	<td>
+	                		<#canVisit uri="/website/articleUpdate.do">
+	                   		 	<i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('信息发布', 'article', 1200, 900, '${i.id}');"></i>
+	               			 </#canVisit>
+							<#canVisit uri="/website/articleDelete.do">
+	                    		<i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('信息发布', 'article', '${i.id}');"></i>
+	                		</#canVisit>
+	                	</td>
+                	</tr>
+                <%}} else {%>
+                	<tr>
+						<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+               		 </tr>
+                <%}%>
+              </tbody>
+			</table>
+		</div>
+		  <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>
+	  </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+
+		// 更新时间下限
+		laydate.render({
+			elem: '#updateTimeBottom',
+			format: 'yyyy-MM-dd'
+		});
+		// 更新时间上限
+		laydate.render({
+			elem: '#updateTimeTop',
+			format: 'yyyy-MM-dd'
+		});
+
+    });
+</script>
+</html>

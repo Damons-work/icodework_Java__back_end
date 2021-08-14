@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.tool.mapper.AttachmentMapper">
+	<!-- 数据映射 -->
+	<resultMap id="attachmentMap" type="cn.js.icode.tool.data.Attachment">
+		<id property="id" column="AttachmentId"/>
+		<result property="bizId" column="BizId"/>
+		<result property="title" column="Title"/>
+		<result property="fileUrl" column="FileUrl"/>
+		<result property="fileNo" column="FileNo"/>
+		
+		<!-- 对象数据嵌套 -->
+		<!--
+		<association property="otherPojo" javaType="package.OtherPojo">
+			<result property="propertyName" column="ColumnName"/>
+		</association>
+		-->
+	</resultMap>
+    <!-- 查询附件信息信息 -->
+    <!-- 查询单条附件信息信息 -->
+    <select id="getObject" resultMap="attachmentMap">
+        SELECT
+        T1.AttachmentId, T1.BizId, T1.Title, T1.FileUrl, T1.FileNo
+        FROM tool_attachment_base T1
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.AttachmentId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizId != null and where.bizId != ''">
+                        AND T1.BizId = #{where.bizId}
+                    </if>
+	
+                    <if test="where != null and where.title != null and where.title != ''">
+                        AND T1.Title = #{where.title}
+                    </if>
+	
+                    <if test="where != null and where.fileUrl != null and where.fileUrl != ''">
+                        AND T1.FileUrl = #{where.fileUrl}
+                    </if>
+	
+                    <if test="where != null and where.fileNo != null">
+                        AND T1.FileNo = #{where.fileNo}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		ORDER BY T1.AttachmentId DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条附件信息信息 -->
+    <select id="list" resultMap="attachmentMap">
+        SELECT
+        T1.AttachmentId, T1.BizId, T1.Title, T1.FileUrl, T1.FileNo
+        FROM tool_attachment_base T1
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.AttachmentId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizId != null and where.bizId != ''">
+                        AND T1.BizId like concat('%', #{where.bizId}, '%')
+                    </if>
+	
+                    <if test="where != null and where.title != null and where.title != ''">
+                        AND T1.Title like concat('%', #{where.title}, '%')
+                    </if>
+	
+                    <if test="where != null and where.fileUrl != null and where.fileUrl != ''">
+                        AND T1.FileUrl like concat('%', #{where.fileUrl}, '%')
+                    </if>
+	
+                    <if test="where != null and where.fileNo != null">
+                        AND T1.FileNo = #{where.fileNo}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		<if test="pagination == null or pagination.dataSort == null or pagination.dataSort.fieldName == null">
+			ORDER BY T1.AttachmentId DESC
+        </if>
+        <if test="pagination != null and pagination.dataSort != null and pagination.dataSort.fieldName != null">
+			ORDER BY ${pagination.dataSort.fieldName}
+			<if test="pagination.dataSort.direction == 1">ASC</if>
+			<if test="pagination.dataSort.direction == -1">DESC</if>
+        </if>
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM tool_attachment_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    AttachmentId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizId != null and where.bizId != ''">
+                        AND BizId like concat('%', #{where.bizId}, '%')
+                    </if>
+	
+                    <if test="where != null and where.title != null and where.title != ''">
+                        AND Title like concat('%', #{where.title}, '%')
+                    </if>
+	
+                    <if test="where != null and where.fileUrl != null and where.fileUrl != ''">
+                        AND FileUrl like concat('%', #{where.fileUrl}, '%')
+                    </if>
+	
+                    <if test="where != null and where.fileNo != null">
+                        AND FileNo = #{where.fileNo}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO tool_attachment_base(AttachmentId, BizId, Title, FileUrl, FileNo)
+        VALUES (
+        #{data.id}, 
+
+		#{data.bizId}, 
+	
+		#{data.title}, 
+	
+		#{data.fileUrl}, 
+	
+		#{data.fileNo}
+	
+        )
+    </insert>
+
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE tool_attachment_base
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                AttachmentId = #{data.id},
+            </if>
+		
+			<if test="data.bizId != null">
+				BizId = #{data.bizId},
+			</if>
+	
+			<if test="data.title != null">
+				Title = #{data.title},
+			</if>
+	
+			<if test="data.fileUrl != null">
+				FileUrl = #{data.fileUrl},
+			</if>
+	
+			<if test="data.fileNo != null">
+				FileNo = #{data.fileNo},
+			</if>
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    AttachmentId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizId != null">
+                        AND BizId = #{where.bizId}
+                    </if>
+	
+                    <if test="where != null and where.title != null">
+                        AND Title = #{where.title}
+                    </if>
+	
+                    <if test="where != null and where.fileUrl != null">
+                        AND FileUrl = #{where.fileUrl}
+                    </if>
+	
+                    <if test="where != null and where.fileNo != null">
+                        AND FileNo = #{where.fileNo}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除附件信息信息 -->
+    <delete id="delete">
+        DELETE FROM tool_attachment_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    AttachmentId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizId != null">
+                        AND BizId = #{where.bizId}
+                    </if>
+	
+                    <if test="where != null and where.title != null">
+                        AND Title = #{where.title}
+                    </if>
+	
+                    <if test="where != null and where.fileUrl != null">
+                        AND FileUrl = #{where.fileUrl}
+                    </if>
+	
+                    <if test="where != null and where.fileNo != null">
+                        AND FileNo = #{where.fileNo}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

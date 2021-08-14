@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}    
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+	<form id="fAudit" class="layui-form" onsubmit="return false" action="#">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+		
+  		<div class="layui-card">
+  			<p style="color:red;">[在当前页面上部填充申请单据摘要信息]</p>
+		</div>
+		
+		<!-- 审批任务列表，可以看到审批进行到哪一步 -->
+		${auditTaskHtml}
+		
+		<input type="hidden" name="bizCode" value="${isEmpty(bizCode) ? '' : bizCode}"/>
+		<input type="hidden" name="bizNo" value="${isEmpty(bizNo) ? '' : bizNo}"/>
+		
+		
+  		<div class="layui-card">
+			<div class="layui-card-header">填写审批</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<div class="layui-form-item">
+					<label class="layui-form-label">审批结果：</label>
+					<div class="layui-input-inline">
+						<input type="radio" name="passFlag" value="true" title="通过"/>
+						<input type="radio" name="passFlag" value="false" title="驳回"/>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">审批意见：</label>
+					<div class="layui-input-block"><input type="text" name="comment" autocomplete="off" class="layui-input" maxlength="100"></div>
+				</div>
+				
+			</div>
+		</div>
+				
+		<div class="layui-form-item layui-layout-admin">
+			<div class="layui-input-block">
+				<div class="layui-footer" style="left: 0;">
+					<button class="layui-btn" onclick="doAuditAction();">审 批</button>
+				</div>
+			</div>
+		</div>
+		
+	</form>
+</div>
+</body>
+<script>
+	layui.use(['form'], function(){
+        var form  = layui.form;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+	
+	function validate(theForm) {
+		// 注意：
+		// 如果更改页面表单的控件类型，请在校验判断时做对应修改：
+		// 1. 下拉框：使用 $.trim(theForm["控件名称"].value) == ""
+		// 2. 单选框/复选框：使用 getChoiceValue("控件名称") == null
+		// 	
+		var pass = getChoiceValue("passFlag");
+		if(pass == null) {
+			$.message("请选择审批结果！");
+			return false;
+		}
+		
+		console.log(pass);
+		
+		if(pass == 'false' && $.trim(theForm["comment"].value) == "") {
+			$.message("驳回时需要填写审批意见！");
+			return false;
+		}
+	
+		return true;
+	}
+	
+	function doAuditAction(unitEn) {
+	    // 校验表单必填项
+	    try {
+	        var blResult = validate(document.getElementById('fAudit'));
+	        if(!blResult) return;
+	    } catch (e) {
+	        console.log(JSON.stringify(e));
+	    }
+
+	    $.ajax({
+	        url: getFullUrl("xxxxAuditAction.do")
+	        ,type: "post"
+	        ,data: $("#fAudit").serializeJSON()
+	        ,dataType:'json'
+	        ,traditional: true
+	        ,success:function(result) {
+	            returnDialog(result);
+	        }
+	    })
+	}
+</script>
+</html>

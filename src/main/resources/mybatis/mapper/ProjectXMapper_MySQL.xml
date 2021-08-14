@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.project.mapper.ProjectXMapper">
+	<!-- 数据映射 -->
+	<resultMap id="projectXMap" type="cn.js.icode.project.entity.ProjectX">
+		<id property="id" column="project_id"/>
+		<result property="projectName" column="project_name"/>
+		<result property="afterTax" column="after_tax"/>
+		<result property="statusFlag" column="status_flag"/>
+		<result property="beginDate" column="begin_date"/>
+		<result property="endDate" column="end_date"/>
+		<result property="leaderId" column="leader_id"/>
+		
+		<!-- 对象数据嵌套 -->
+		<association property="leader" javaType="cn.js.icode.project.entity.Person">
+			<id property="id" column="person_id"/>
+			<result property="personName" column="person_name"/>
+			<result property="cost" column="cost"/>
+		</association>
+	</resultMap>
+    <!-- 查询项目信息 -->
+    <!-- 查询单条项目信息 -->
+    <select id="getObject" resultMap="projectXMap">
+        SELECT
+        T1.project_id, T1.project_name, T1.after_tax, T1.status_flag, T1.begin_date, T1.end_date, T1.leader_id,
+        T2.person_id, T2.person_name, T2.cost
+        FROM project_project_x T1 left join project_person_base T2 on T1.leader_id = T2.person_id
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.project_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectName != null and where.projectName != ''">
+                        AND T1.project_name = #{where.projectName}
+                    </if>
+	
+                    <if test="where != null and where.afterTax != null">
+                        AND T1.after_tax = #{where.afterTax}
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND T1.status_flag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.beginDate != null">
+						<![CDATA[ AND DATE_FORMAT(T1.begin_date, '%Y-%m-%d') = DATE_FORMAT(#{where.beginDate}, '%Y-%m-%d') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDate != null">
+						<![CDATA[ AND DATE_FORMAT(T1.end_date, '%Y-%m-%d') = DATE_FORMAT(#{where.endDate}, '%Y-%m-%d') ]]>
+                    </if>
+	
+                    <if test="where != null and where.leaderId != null">
+                        AND T1.leader_id = #{where.leaderId}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		ORDER BY T1.project_id DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条项目信息 -->
+    <select id="list" resultMap="projectXMap">
+        SELECT
+        T1.project_id, T1.project_name, T1.after_tax, T1.status_flag, T1.begin_date, T1.end_date, T1.leader_id,
+        T2.person_id, T2.person_name, T2.cost
+        FROM project_project_x T1 left join project_person_base T2 on T1.leader_id = T2.person_id
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.project_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectName != null and where.projectName != ''">
+                        AND T1.project_name like concat('%', #{where.projectName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.afterTax != null">
+                        AND T1.after_tax = #{where.afterTax}
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND T1.status_flag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.beginDateBottom != null">
+						<![CDATA[ AND DATE_FORMAT(T1.begin_date, '%Y-%m-%d %H:%i') >= DATE_FORMAT(#{where.beginDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.beginDateTop != null">
+						<![CDATA[ AND DATE_FORMAT(T1.begin_date, '%Y-%m-%d %H:%i') <= DATE_FORMAT(#{where.beginDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDateBottom != null">
+						<![CDATA[ AND DATE_FORMAT(T1.end_date, '%Y-%m-%d %H:%i') >= DATE_FORMAT(#{where.endDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.endDateTop != null">
+						<![CDATA[ AND DATE_FORMAT(T1.end_date, '%Y-%m-%d %H:%i') <= DATE_FORMAT(#{where.endDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.leaderId != null">
+                        AND T1.leader_id = #{where.leaderId}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+		<if test="pagination == null or pagination.dataSort == null or pagination.dataSort.fieldName == null">
+			ORDER BY T1.project_id DESC
+        </if>
+        <if test="pagination != null and pagination.dataSort != null and pagination.dataSort.fieldName != null">
+			ORDER BY ${pagination.dataSort.fieldName}
+			<if test="pagination.dataSort.direction == 1">ASC</if>
+			<if test="pagination.dataSort.direction == -1">DESC</if>
+        </if>
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM project_project_x
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    project_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectName != null and where.projectName != ''">
+                        AND project_name like concat('%', #{where.projectName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.afterTax != null">
+                        AND after_tax = #{where.afterTax}
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND status_flag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.beginDateBottom != null">
+						<![CDATA[ AND begin_date >= DATE_FORMAT(#{where.beginDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.beginDateTop != null">
+						<![CDATA[ AND begin_date <= DATE_FORMAT(#{where.beginDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDateBottom != null">
+						<![CDATA[ AND end_date >= DATE_FORMAT(#{where.endDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.endDateTop != null">
+						<![CDATA[ AND end_date <= DATE_FORMAT(#{where.endDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.leaderId != null">
+                        AND leader_id = #{where.leaderId}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增项目信息 -->
+
+    <insert id="insert" parameterType="cn.js.icode.project.entity.ProjectX" useGeneratedKeys="true" keyProperty="data.id">
+
+        INSERT INTO project_project_x(project_id, project_name, after_tax, status_flag, begin_date, end_date, leader_id)
+        VALUES (
+        #{data.id}, 
+
+		#{data.projectName}, 
+	
+		#{data.afterTax}, 
+	
+		#{data.statusFlag}, 
+	
+		#{data.beginDate}, 
+	
+		#{data.endDate}, 
+	
+		#{data.leaderId}
+	
+        )
+    </insert>
+
+    <!-- 修改项目信息 -->
+    <update id="update">
+        UPDATE project_project_x
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                project_id = #{data.id},
+            </if>
+		
+			<if test="data.projectName != null">
+				project_name = #{data.projectName},
+			</if>
+	
+			<if test="data.afterTax != null">
+				after_tax = #{data.afterTax},
+			</if>
+	
+			<if test="data.statusFlag != null">
+				status_flag = #{data.statusFlag},
+			</if>
+	
+            <if test="data.beginDate != null">
+                begin_date = #{data.beginDate},
+            </if>		
+	
+            <if test="data.endDate != null">
+                end_date = #{data.endDate},
+            </if>		
+	
+			<if test="data.leaderId != null">
+				leader_id = #{data.leaderId},
+			</if>
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    project_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectName != null">
+                        AND project_name = #{where.projectName}
+                    </if>
+	
+                    <if test="where != null and where.afterTax != null">
+                        AND after_tax = #{where.afterTax}
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND status_flag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.beginDateTop != null">
+						<![CDATA[ AND begin_date <= DATE_FORMAT(#{where.beginDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.beginDateBottom != null">
+						<![CDATA[ AND begin_date >= DATE_FORMAT(#{where.beginDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDateTop != null">
+						<![CDATA[ AND end_date <= DATE_FORMAT(#{where.endDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.endDateBottom != null">
+						<![CDATA[ AND end_date >= DATE_FORMAT(#{where.endDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.leaderId != null">
+                        AND leader_id = #{where.leaderId}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除项目信息 -->
+    <delete id="delete">
+        DELETE FROM project_project_x
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    project_id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectName != null">
+                        AND project_name = #{where.projectName}
+                    </if>
+	
+                    <if test="where != null and where.afterTax != null">
+                        AND after_tax = #{where.afterTax}
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND status_flag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.beginDateTop != null">
+						<![CDATA[ AND begin_date <= DATE_FORMAT(#{where.beginDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.beginDateBottom != null">
+						<![CDATA[ AND begin_date >= DATE_FORMAT(#{where.beginDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.endDateTop != null">
+						<![CDATA[ AND end_date <= DATE_FORMAT(#{where.endDateTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.endDateBottom != null">
+						<![CDATA[ AND end_date >= DATE_FORMAT(#{where.endDateBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.leaderId != null">
+                        AND leader_id = #{where.leaderId}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

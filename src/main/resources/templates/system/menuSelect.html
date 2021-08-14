@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body class="layui-layout-body">
+<div class="layui-fluid">
+    <form id="fAdd" class="layui-form" action="#" onsubmit="return false" method="post">
+        <input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+        <div class="layui-card"  style="display: inline-block; width: 700px; height: 436px; padding: 10px; border: 1px solid #ddd; overflow: auto;">
+            <div class="layui-card-body" style="padding: 15px;">
+                <div class="layui-tab-item layui-show">
+                    <ul id="ulTree"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-layout-admin">
+            <div class="layui-input-block">
+                <div class="layui-footer" style="left: 0;">
+                    <button class="layui-btn" onclick="onSelected();">确 认</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $("body").on("mousedown",".layui-tree a",function(){
+        $(".layui-tree a cite").css('color','black')
+        $(this).children("cite").css('color','red')
+    })
+    
+
+    var selectItem;
+    layui.use(['element', 'tree'], function(){
+        var treeSelectDataList = jQuery.parseJSON('${treeSelectDataList}');
+        console.log(treeSelectDataList);
+        var element = layui.element;
+        $('#ulTree').html('');
+        layui.tree({
+            elem: '#ulTree' //指定元素
+            , click: function (item) {
+                selectItem = item;
+            }
+            , nodes: treeSelectDataList
+        });
+    });
+
+    // 确定选择
+    function onSelected() {
+        var result = {
+            "statusCode" : 100,
+            "message" : "",
+            "dto" : selectItem
+        };
+
+        returnDialog(result);
+    }
+
+    // 清除选择
+    function onClear() {
+        var result = {
+            "statusCode" : 100,
+            "message" : ""
+        };
+
+        returnDialog(result);
+    }
+</script>
+</body>
+</html>
+

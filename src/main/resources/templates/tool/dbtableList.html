@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" action="dbtableList.do" method="post">
+	  <input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+	  <input type="hidden" name="dbtable.projectId" value="${dbtable.projectId}"/>
+      <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">工程名称：</label>
+                    <div class="layui-input-inline layui-form-mid">${dbtable.project.projectName}</div>
+                </div>
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">数据表名：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="dbtable.tableName" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(dbtable.tableName)}"
+								class="layui-input" style="width:150px" maxlength="25" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+	                <#canVisit uri="/tool/dbtableAdd.do">
+	                <a class="layui-btn layui-btn-warm" onclick="doAdd('数据表', 'dbtable', 1200, 800);">新增</a>
+	                </#canVisit>
+                </div>
+            </div>
+            <table class="layui-table">
+             <thead>
+             <tr>
+                <th>包前缀</th>
+			  <th>数据表名称</th>
+			  <th>数据表说明</th>
+			  <th width="150" class="center">创建时间</th>
+			  <th class="center">基本工作量</th>
+                <th width="100" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(dbtableList) && dbtableList != null && !isEmpty(dbtableList)){ for(i in dbtableList) {%>
+                <tr>
+	                <td>${i.packagePrefix}</td>
+				  <td><a href="javascript:doView('数据表', 'dbtable', 1000, 600, '${i.id}');" style="color:#01AAED;">${i.tableName}</a></td>
+				  <td>${i.tableDescription}</td>
+				  <td>${i.createTime, "yyyy-MM-dd HH:ss"}</td>
+				  <td>${i.workload} 人.天</td>
+	              <td>
+	                <#canVisit uri="/tool/dbtableUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('数据表', 'dbtable', 1200, 800, '${i.id}');"></i>
+	                    <i class="layui-icon layui-icon-template" title="复制" style="cursor:pointer;font-size:20px;color:#5FB878;margin:5px;" onclick="doCopy('数据表', 'dbtable', 1200, 800, '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/tool/dbtableDelete.do">
+	                    <i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('数据表', 'dbtable', '${i.id}');"></i>
+	                </#canVisit>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        // 渲染表单radio、select、checkbox
+        form.render();
+		// 创建时间下限
+		laydate.render({
+			elem: '#createTimeBottom',
+			format: 'yyyy-MM-dd'
+		});
+		// 创建时间上限
+		laydate.render({
+			elem: '#createTimeTop',
+			format: 'yyyy-MM-dd'
+		});
+    });
+	
+	function doAdd(unitCh, unitEn, width, height) {
+    	var url = getFullUrl(unitEn +"Add.do?dbtable.projectId=" + document.forms[0]["dbtable.projectId"].value);
+    	
+    	// 打开对话框
+    	openDialog(unitCh + '新增', url, width, height, function(result) {
+    	    // 成功执行（result.statusCode == 200）后的回调函数
+            submitForm();
+    	});
+    }
+	
+	function doCopy(unitCh, unitEn, width, height, sltId) {
+		var url = getFullUrl(unitEn + "Copy.do?id=" + sltId);
+	    // 打开对话框
+	    openDialog(unitCh + '复制', url, width, height, function(result) {
+	        // 成功执行（result.statusCode == 200）后的回调函数
+	        submitForm();
+	    });
+	}
+</script>
+</html>

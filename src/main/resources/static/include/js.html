@@ -1,0 +1,14 @@
+  <script>
+  	// 获取根域名
+	var arr = location.hostname.split('.');
+	while(arr.length > 2) {
+		arr = arr.slice(1);
+		try {
+			// 设置根域名为document.domain
+			document.domain = arr.join('.');
+		} catch (e) {}
+	}
+  </script>
+  <script language="javascript" src="../js/jquery-3.3.1.min.js"></script>
+  <script language="javascript" src="../layuiadmin/layui/layui.js"></script>  
+  <script language="javascript" src="../js/jquery-icode.js"></script>

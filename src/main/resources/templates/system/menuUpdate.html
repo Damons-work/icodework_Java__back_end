@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<%
+	include("/static/include/title.html"){}
+	include("/static/include/css.html"){}
+	include("/static/include/js.html"){}
+	%>
+</head>
+<body>
+<div class="layui-fluid">
+	<form id="fUpdate" class="layui-form" action="#" onsubmit="return false" method="post">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+		<input type="hidden" name="menu.id" value="${menu.id}"/>
+		<input type="hidden" name="menu.iconImage" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(menu.iconImage)}"/>
+
+		<div class="layui-card">
+			<div class="layui-card-header">基础信息</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">上级节点：</label>
+						<div class="layui-input-inline layui-form-mid layui-word-aux">
+
+							<select name="menu.parentId">
+								<option value="">--请选择--</option>
+								<% if(has(parentMenu) && parentMenu != null){ for(i in parentMenu) {%>
+								<option value="${i.id}"<% if(menu.parentId == i.id) {%> selected<%}%>>${i.menuName}</option>
+								<%}}%>
+							</select>
+
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">菜单名称<span style="color:#FF5722;">*</span>：</label>
+						<div class="layui-input-inline">
+							<input type="text" name="menu.menuName" placeholder="菜单名称" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(menu.menuName)}" autocomplete="off" class="layui-input" maxlength="25">
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">排序序号：</label>
+						<div class="layui-input-inline">
+							<input type="text" name="menu.orderBy" placeholder="字母或数字，按ASCII码排序" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(menu.orderBy)}" autocomplete="off" class="layui-input" maxlength="5">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">菜单图标：</label>
+						<div class="layui-input-inline layui-form-mid layui-word-aux">
+							&nbsp;
+							<span id="iconDisplay">
+							<%if(isNotEmpty(menu.iconImage)) {%><i class="layui-icon ${menu.iconImage}"></i><%}%>
+							<%if(isEmpty(menu.iconImage)) {%><i class="layui-icon layui-icon-file"></i><%}%>
+							</span>
+							&nbsp;
+							<button class="layui-btn layui-btn-xs layui-btn-warm" onclick="selectIcon();">
+								<i class="layui-icon layui-icon-ok"></i>
+								选择
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<br/>
+		<div class="layui-card">
+			<div class="layui-card-header">地址信息</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<div class="layui-form-item">
+					<label class="layui-form-label">菜单地址：</label>
+					<div class="layui-input-block">
+						<input type="text" name="menu.menuUrl" placeholder="菜单地址，使用'-'号开头表示弹出窗口方式打开" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(menu.menuUrl)}" autocomplete="off" class="layui-input" maxlength="250">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">帮助文档：</label>
+					<div class="layui-input-block">
+						<input type="text" name="menu.helpUrl" placeholder="帮助文档可以在其它系统中维护，链接于此" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(menu.helpUrl)}" autocomplete="off" class="layui-input" maxlength="250">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">接口地址：</label>
+					<div class="layui-input-block">
+						<input type="text" name="menu.apiUrl" placeholder="菜单页面功能对外提供的接口地址，推荐使用swagger地址" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(menu.apiUrl)}" autocomplete="off" class="layui-input" maxlength="250">
+					</div>
+				</div>
+
+				功能权限 (<span style="color:#FF5722;">用于按钮、链接访问权限控制</span>)：
+				<button class="layui-btn layui-btn-xs layui-btn-warm" onclick="addRow(document.getElementById('dynamicTable'));">
+					<i class="layui-icon layui-icon-add-1"></i>
+					添加一个功能权限
+				</button>
+				<table class="layui-table" id="dynamicTable">
+					<thead>
+					<tr>
+						<th width="40" align="center">序号</th>
+						<th width="120" align="center">权限类型</th>
+						<th>访问地址</th>
+						<th width="60" align="center">操作</th>
+					</tr>
+					</thead>
+					<tbody>
+					<% if(has(mfList) && mfList != null){ for(i in mfList) {%>
+					<tr id="line${iLP.index}">
+						<td align="center">${iLP.index}</td>
+						<td align="center">
+							<select name="menuFunction.typeFlag" style="width:98%">
+								<% if(has(typeList) && typeList != null){ for(j in typeList) {%>
+								<option value='${j.key}'<%if(j.key == i.typeFlag) {%> selected<%}%>>${j.value}</option>
+								<%}}%>
+								</select>
+						</td>
+						<td align="center"><input name='menuFunction.functionUrl' class="layui-input" style='width:98%;' value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(i.functionUrl)}"></td>
+						<td align="center"><i class='layui-icon layui-icon-delete' title="删除" onclick='deleteRow(document.getElementById("dynamicTable"), "line${iLP.index}");' style='font-size: 20px; color: #1E9FFF;'></i></td>
+					</tr>
+					<%}}%>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="layui-form-item layui-layout-admin">
+			<div class="layui-input-block">
+				<div class="layui-footer" style="left: 0;">
+					<button class="layui-btn" onclick="doUpdateAction('menu');">修 改</button>
+				</div>
+			</div>
+		</div>
+
+	</form>
+</div>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form;
+        form.render();
+    });
+
+    // 权限类型下拉框的option
+    var permissionSlt = '<select name="menuFunction.typeFlag" style="width:98%">' +
+        <% if(has(typeList) && typeList != null){ for(i in typeList) {%>
+        '<option value=\'${i.key}\'>${i.value}</option>' +
+        <%}}%>
+    '</select>';
+
+    // 行增长的序号
+    var nLineIndex = ${has(mfList) ? mfList.~size : 0};
+    function addRow(tbl) {
+        var newRow = tbl.insertRow(-1);
+        newRow.id = 'line' + nLineIndex;
+
+        nLineIndex++;
+        var td1 = document.createElement("td");
+        td1.align = "center";
+        var td2 = document.createElement("td");
+        td2.align = "center";
+        var td3 = document.createElement("td");
+        td3.align = "center";
+        var td4 = document.createElement("td");
+        td4.align = "center";
+
+        // 表格行数
+        var lineCount = tbl.rows.length;
+        // 编号
+        // td1.innerHTML = (lineCount - 1) + "";
+        // 类型{1:查看2:新增3:修改4:删除5:导入6:导出7:审核8:扩展A9:扩展B}
+        td2.innerHTML = permissionSlt;
+        // 访问地址
+        td3.innerHTML = '<input name=\'menuFunction.functionUrl\' class=\"layui-input\" style=\'width:98%;\'>';
+        // 操作
+        td4.innerHTML = '<i class=\'layui-icon layui-icon-delete\' title="删除" onclick=\'deleteRow(document.getElementById(\"dynamicTable\"), \"' + newRow.id + '\")\' style=\'cursor:pointer;font-size:20px;color:#01AAED;margin:5px;\'></i>';
+
+        newRow.appendChild(td1);
+        newRow.appendChild(td2);
+        newRow.appendChild(td3);
+        newRow.appendChild(td4);
+
+        // 梳理表信息字段序号
+        fillNo(tbl);
+
+        if(layui.form != null) {
+            layui.form.render();
+        }
+    }
+
+    // 梳理表信息字段序号
+    function fillNo(tbl) {
+        var lineCount = tbl.rows.length;
+        for(var i = 1; i < lineCount; i++) {
+            var tempCell = tbl.rows[i].cells[0];
+            tempCell.innerHTML = i + "";
+        }
+    }
+
+    function deleteRow(tbl, lineId) {
+        if(tbl.rows.length <= 1 || lineId == null) {
+            return;
+        }
+
+        var lineField = document.getElementById(lineId);
+
+        if(lineField == null) {
+            $.alert("请选择一条字段然后执行本操作！");
+            return;
+        }
+
+        $.confirm('你确定删除该行？', function() {
+            tbl.deleteRow(lineField.rowIndex);
+            // 梳理表信息字段序号
+            fillNo(tbl);
+        });
+    }
+
+    function selectIcon() {
+        openDialog("图标选择", '../system/iconSelect.do', 800, 450, function(result) {
+            // 选择的图标class
+            var icon = result.icon;
+            $("#iconDisplay").html("<i class='layui-icon " + icon + "'></i>");
+            document.forms[0]["menu.iconImage"].value = icon;
+        });
+    }
+
+    function validate(theForm) {
+        // 注意：
+        // 如果更改页面表单的控件类型，请在校验判断时做对应修改：
+        // 1. 下拉框：使用 $.trim(theForm["控件名称"].value) == ""
+        // 2. 单选框/复选框：使用 getChoiceValue("控件名称") == null
+        //
+        if($.trim(theForm["menu.menuName"].value) == "") {
+            $.message("菜单名称不能为空！");
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

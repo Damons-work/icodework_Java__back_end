@@ -1,0 +1,122 @@
+server:
+  # 对外服务的端口
+  port: 80
+
+spring:
+  application:
+    name: "权限管理"               # 标题
+  servlet:
+    multipart:
+      max-file-size: 10MB               # 上传文件大小
+
+# 是否使用验证码
+login:
+  validation:
+    code: true
+
+# 文件上传、下载
+file:
+  attachment:
+    # 上传处理器
+    # 默认上传到本地
+    manager: "team.bangbang.common.file.LocalFileManager"
+    # 上传到本地的设置
+    # 上传到本地的文件目录
+    directory: "/home/folder/attachment"
+
+# 数据库连接配置。可以使用不同的顶级节点名称配置多个数据库连接。
+# 顶级节点名称即为数据库连接别名，默认数据库连接别名：application
+application:
+  druid:
+    # 数据库URL
+    driver-class: "com.mysql.jdbc.Driver"
+    url: "jdbc:mysql://icode-in.mysql.huhehaote.rds.aliyuncs.com:3306/console"
+    username: console
+    password: "Console1234"
+    initial-size: 1
+    min-idle: 1
+    max-active: 100
+    maxWait: 600
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: "SELECT 'x'"
+    testWhileIdle: true
+    testOnReturn: false
+    testOnBorrow: true
+
+# Redis配置
+redis:
+  host: "r-hp3b0ad58d84e3b4.redis.huhehaote.rds.aliyuncs.com"
+  port: 6379
+  password: Zkrspx1234
+  # 数据库序号 [0~15]
+  database: 0
+  # 最大连接数，-1：不限制
+  maxActive: 500
+  maxIdle: 5
+
+# 日志配置
+logging:
+  config: "classpath:logback.xml"
+
+# mybatis配置
+mybatis:
+  mapper-locations: "classpath:mybatis/mapper/*.xml"
+  # check-config-location:true
+  config-location: "classpath:mybatis/mybatis-config.xml"
+
+# 过滤器配置
+filter:
+  # DDosFilter
+  DDosFilter:
+    enable: false
+    parameter:
+      # 必填，多个uri使用半角逗号","间隔
+      enter-uri: ""
+      referer-prefix: ""
+      # 可选，[second_limit] > 0 and [visit_limit] > 0
+      second-limit: 2
+      visit-limit: 50
+      # 拒绝后的提示信息
+      deny-message: "{errcode:1740023, errcode:\"Your're not welcome!\"}"
+  # 权限过滤的Filter，如果需要使用SSOContext获取登录信息，则必须开启
+  SSOFilter:
+    enable: true
+
+# 单点登录
+sso:
+  application:
+    id: 1
+    class: "cn.js.icode.sso.server.BangbangApplicationServer"
+  account:
+    class: "cn.js.icode.sso.server.BangbangAccountServer"
+  data-limit:
+    class: "cn.js.icode.sso.server.BangbangDataLimitServer"
+  function-limit:
+    class: "cn.js.icode.sso.server.BangbangFunctionLimitServer"
+    # 权限免校验白名单目录，多个目录以半角逗号","间隔
+    # 可以使用通配符 "*" 忽略所有目录校验
+    no-validation-modules: '/webjars/,/swagger-ui.html/,/swagger-resources/,/help/,/include/,/js/,/layuiadmin/,/sample/,/api/,/common/,/project/'
+    # 权限免校验白名单地址，多个地址以半角逗号","间隔
+    # 可以使用通配符 "*" 忽略所有地址校验，使用通配符时，等同于no_validation_modules使用通配符
+    no-validation-urls: '/index.html,/swagger-ui.html,/v2/api-docs,/swagger-resources,/csrf,/system/logon.do,/system/frame.do,/system/logout.do,/system/passwordUpdate.do,/system/myAccountView.do,*.js,*.txt,*.css'
+
+    # 校验不通过的登录地址
+    login-url: "http://www.bangbang.team/index.html"
+
+### weixin open platform
+open:
+  weixin:
+    appId: wx4de456331bf8c3d1
+    appSecret: f55c999641be79f76b8cf718d0e0d972
+    message:
+      verify:
+        token: token_icode_message_12345
+      encrypt:
+        key: 01a2b3c4d5e01a2b3c4d5e01a2b3c4d5e01a2b3c4d5
+
+# code generator
+code:
+  generator:
+    template:
+      directory: /home/folder/template

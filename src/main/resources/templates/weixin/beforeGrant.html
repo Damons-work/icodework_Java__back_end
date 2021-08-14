@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>公众号授权</title>
+<script type="text/javascript">
+<%if (has(grantUrl)) {%>	
+	location.href = "${grantUrl}";
+<%} %>
+</script>
+</head>
+
+<body>
+${has(message) ? message : ""}
+</body>
+</html>

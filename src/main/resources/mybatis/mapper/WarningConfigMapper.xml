@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.system.mapper.WarningConfigMapper">
+    <!-- 数据映射 -->
+    <resultMap id="warningConfigMap" type="cn.js.icode.system.data.WarningConfig">
+        <id property="id" column="Id"/>
+        <result property="dbAlias" column="DbAlias"/>
+        <result property="tip" column="Tip"/>
+        <result property="menuId" column="MenuId"/>
+        <result property="querySql" column="QuerySql"/>
+
+        <!-- 对象数据嵌套 -->
+        <association property="menu" javaType="cn.js.icode.system.data.Menu">
+            <id property="menuId" column="MenuId"/>
+            <result property="menuName" column="MenuName"/>
+            <result property="menuUrl" column="MenuUrl"/>
+        </association>
+    </resultMap>
+    <!-- 查询告警配置信息 -->
+    <!-- 查询单条告警配置信息 -->
+    <select id="getObject" resultMap="warningConfigMap">
+        SELECT
+        T1.Id, T1.DbAlias, T1.Tip, T1.MenuId, T1.QuerySql, M.MenuName, M.MenuUrl
+        FROM system_warning_config T1
+        LEFT JOIN system_menu_base M ON T1.MenuId = M.MENUID
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.Id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.dbAlias != null and where.dbAlias != ''">
+                        AND T1.DbAlias = #{where.dbAlias}
+                    </if>
+	
+                    <if test="where != null and where.tip != null and where.tip != ''">
+                        AND T1.Tip = #{where.tip}
+                    </if>
+	
+                    <if test="where != null and where.menuId != null">
+                        AND T1.MenuId = #{where.menuId}
+                    </if>
+	
+                    <if test="where != null and where.querySql != null and where.querySql != ''">
+                        AND T1.QuerySql = #{where.querySql}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY T1.Id DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条告警配置信息 -->
+    <select id="list" resultMap="warningConfigMap">
+        SELECT
+        T1.Id, T1.DbAlias, T1.Tip, T1.MenuId, T1.QuerySql, M.MenuName, M.MenuUrl
+        FROM system_warning_config T1
+        LEFT JOIN system_menu_base M ON T1.MenuId = M.MENUID
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    T1.Id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.dbAlias != null and where.dbAlias != ''">
+                        AND T1.DbAlias like concat('%', #{where.dbAlias}, '%')
+                    </if>
+	
+                    <if test="where != null and where.tip != null and where.tip != ''">
+                        AND T1.Tip like concat('%', #{where.tip}, '%')
+                    </if>
+	
+                    <if test="where != null and where.menuId != null">
+                        AND T1.MenuId = #{where.menuId}
+                    </if>
+	
+                    <if test="where != null and where.querySql != null and where.querySql != ''">
+                        AND T1.QuerySql like concat('%', #{where.querySql}, '%')
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY T1.Id DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM system_warning_config
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.dbAlias != null and where.dbAlias != ''">
+                        AND DbAlias like concat('%', #{where.dbAlias}, '%')
+                    </if>
+	
+                    <if test="where != null and where.tip != null and where.tip != ''">
+                        AND Tip like concat('%', #{where.tip}, '%')
+                    </if>
+	
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+	
+                    <if test="where != null and where.querySql != null and where.querySql != ''">
+                        AND QuerySql like concat('%', #{where.querySql}, '%')
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO system_warning_config(Id, DbAlias, Tip, MenuId, QuerySql)
+        VALUES (
+        #{data.id}, 
+
+		#{data.dbAlias}, 
+	
+		#{data.tip}, 
+	
+		#{data.menuId}, 
+	
+		#{data.querySql}
+	
+        )
+    </insert>
+
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE system_warning_config
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                Id = #{data.id},
+            </if>
+		
+			<if test="data.dbAlias != null">
+				DbAlias = #{data.dbAlias},
+			</if>
+	
+			<if test="data.tip != null">
+				Tip = #{data.tip},
+			</if>
+	
+			<if test="data.menuId != null">
+				MenuId = #{data.menuId},
+			</if>
+	
+			<if test="data.querySql != null">
+				QuerySql = #{data.querySql},
+			</if>
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.dbAlias != null">
+                        AND DbAlias = #{where.dbAlias}
+                    </if>
+	
+                    <if test="where != null and where.tip != null">
+                        AND Tip = #{where.tip}
+                    </if>
+	
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+	
+                    <if test="where != null and where.querySql != null">
+                        AND QuerySql = #{where.querySql}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除告警配置信息 -->
+    <delete id="delete">
+        DELETE FROM system_warning_config
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.dbAlias != null">
+                        AND DbAlias = #{where.dbAlias}
+                    </if>
+	
+                    <if test="where != null and where.tip != null">
+                        AND Tip = #{where.tip}
+                    </if>
+	
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+	
+                    <if test="where != null and where.querySql != null">
+                        AND QuerySql = #{where.querySql}
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

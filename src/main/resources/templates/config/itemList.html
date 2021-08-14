@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" method="post">
+      <div class="layui-card">
+        <div class="layui-card-body">
+        
+			<input type="hidden" name="item.category" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(item.category)}"/>
+			<input type="hidden" name="item.parentId" value="${item.parentId}"/>
+			
+            <div class="layui-form-item">
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+	                <#canVisit uri="/config/itemAdd.do">
+	                <a class="layui-btn layui-btn-warm" onclick="doAdd('选项配置', 'item', 720, 450);">新增</a>
+	                </#canVisit>
+                </div>
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">所属路径：</label>
+					<div class="layui-input-inline layui-form-mid">
+						<% if(has(pathList) && pathList != null){ for(i in pathList) {%>
+						<%if(!iLP.last) {%><a href="javascript:;" onclick="showSonItem('${i.id}');" style='color: #1E9FFF;'>${i.itemName}</a> /<%}%>
+						<%if(iLP.last) {%>${i.itemName}<%}%>
+						<%}}%>
+					</div>
+                </div>
+            </div>
+            
+            <table class="layui-table">
+             <thead>
+             <tr>
+			  <th width="100" class="center">选项编码</th>
+			  <th>选项名称</th>
+			  <th>所属分类</th>
+			  <th>备注信息</th>
+			  <th width="80" class="center">子项数量</th>
+                <th width="80" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(itemList) && itemList != null && !isEmpty(itemList)){ for(i in itemList) {%>
+                <tr>
+				  <td><a href="javascript:doView('选项配置', 'item', 720, 450, '${i.id}');" style="color:#01AAED;">${i.itemCode}</a></td>
+				  <td>${i.itemName}</td>
+				  <td>${i.category}</td>
+				  <td>${i.remark}</td>
+				  <td><a href="javascript:void(0);" style="color:#01AAED;" onclick="showSonItem('${i.id}');">${i.sonCount} (进入)</a></td>
+	                <td>
+	                <#canVisit uri="/config/itemUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('选项配置', 'item', 720, 450, '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/config/itemDelete.do">
+	                    <i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('选项配置', 'item', '${i.id}');"></i>
+	                </#canVisit>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+
+	function listItem(category) {
+		document.forms[0]["item.category"].value = category;
+		document.forms[0]['item.parentId'].value = '';
+		document.forms[0].submit();
+	}
+	
+	function showSonItem(pId) {
+		document.forms[0]['item.parentId'].value = pId;
+		document.forms[0].submit();
+	}
+	
+	function doAdd(unitCh, unitEn, nWidth, nHeight) {
+		// 访问地址
+		var url = getFullUrl(unitEn + 'Add.do');
+		
+		var cat = document.forms[0]["item.category"].value;
+		if($.trim(cat) == "") {
+			alert("请选择左侧分类后执行添加！");
+			return false;
+		}
+		
+		cat = encodeURIComponent(cat);
+		// 父编号
+		var pId = $.trim(document.forms[0]['item.parentId'].value);
+		url = url + '?item.category=' + cat + '&item.parentId=' + pId;
+		top.openDialog(unitCh + '新增', url, nWidth, nHeight, function(result){
+			// statusCode： 100表示成功  其它表示失败
+			if(result != null && result.statusCode == 200) submitForm();
+		});
+	}
+</script>
+</html>

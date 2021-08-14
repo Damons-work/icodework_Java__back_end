@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>读取weixin_oAuth</title>
+<!-- 此处引用固定js，js后面传递的grantId为相应的公众号在本平台的授权编号 -->
+<script type="text/javascript" src="http://console.icode.js.cn/api/weixin/get-weixin.js?grantId=G0002"></script>
+</head>
+
+<body>
+	<p id="xx"></p>
+</body>
+
+<script type="text/javascript">
+	/***************************************************************************
+	 * 以下2个on...Get()函数为回调函数，只能保留其中之一，另外1个函数需要注释掉
+	 ***************************************************************************/
+	// 获取微信openId
+	/*
+	function onOpenIdGet(openId) {
+		document.getElementById("xx").innerHTML = "OpenId is : " + openId;
+	}
+	*/
+	// 获取微信用户信息
+	/*
+	{
+		typeFlag    : 类型标识{1：微信2：支付宝}
+		unionId     : unionId
+		openId      : openId
+		nickname    : 昵称
+		email       : 电子信箱
+		mobile      : 手机号码
+		sexFlag     : 性别标识{1：男2：女} 
+		country     : 国家
+		province    : 省份
+		city        : 城市
+		headimgurl  : 头像图片地址
+	}
+	*/
+	function onUserInfoGet(user) {
+		alert("Info is : " + JSON.stringify(user));
+		document.getElementById("xx").innerHTML = JSON.stringify(user);
+	}
+</script>
+</html>

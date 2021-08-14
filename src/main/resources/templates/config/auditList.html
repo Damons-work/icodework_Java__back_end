@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    
+    include("/static/include/css.html"){}
+
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" action="auditList.do" method="post" onsubmit="return false">
+      <div class="layui-card">
+        <div class="layui-card-body">
+
+            <div class="layui-form-item">
+	
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">申请单：</label>
+                    <div class="layui-input-inline">
+						<select name="audit.bizCode" style="width:150px" onchange="changeQuery();">
+							<option value="">--请选择--</option>
+							<% if(has(bizList) && bizList != null) { for(i in bizList) {%>
+							<option value="${i.itemCode}"<% if(audit.bizCode == i.itemCode) {%> selected<%}%>>${i.itemName}</option>
+							<%}}%>
+						</select>
+					</div>
+                </div>
+		  
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">有效标识：</label>
+                    <div class="layui-input-inline">
+						<input type="radio" name="audit.activeFlag" value="true" title="有效"<% if(audit.activeFlag != null && audit.activeFlag) {%> checked<%}%>/>
+						<input type="radio" name="audit.activeFlag" value="false" title="禁用"<% if(audit.activeFlag == null || !audit.activeFlag) {%> checked<%}%>/>
+					</div>
+                </div>
+		  
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+	                <#canVisit uri="/config/auditAdd.do">
+	                <a class="layui-btn layui-btn-warm" onclick="doAdd('审批流程', 'audit', 800, 600);">新增</a>
+	                </#canVisit>
+                </div>
+            </div>
+
+            <table class="layui-table">
+             <thead>
+             <tr>
+                <th width="30" class="center">序号</th>
+	
+			  <th width="120" class="center">申请单（编码）</th>
+			  
+			  <th width="80">适用组织</th>
+			  
+			  <th width="80">申请人</th>
+			  
+			  <th width="100">有效标识</th>
+		
+			  <th width="80">环节数量</th>
+		  
+                <th width="80" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(auditList) && auditList != null && !isEmpty(auditList)){ for(i in auditList) {%>
+                <tr>
+	                <td><a href="javascript:doView('审批流程', 'audit', 800, 600, '${i.id}');" style="color:#01AAED;">${i.id}</a></td>
+			
+				  <td>${isEmpty(i.biz)?'':i.biz.itemName}（${i.bizCode}）</td>
+			
+				  <td>${isEmpty(i.organization)?'':i.organization.fullName}</td>
+			
+				  <td>${isEmpty(i.user)?'':i.user.userName}</td>
+			
+				  <td>
+					<% if(i.activeFlag != null && i.activeFlag) {%>有效<%}%>
+					<% if(i.activeFlag != null && !i.activeFlag) {%>禁用<%}%>
+				  </td>
+			
+				  <td>${i.itemCount}</td>
+			
+	                <td>
+	                <#canVisit uri="/config/auditUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('审批流程', 'audit', 800, 600, '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/config/auditDelete.do">
+	                    <i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('审批流程', 'audit', '${i.id}');"></i>
+	                </#canVisit>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>    
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+
+    });
+</script>
+</html>

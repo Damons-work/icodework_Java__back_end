@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.config.mapper.AuditTaskMapper">
+    <!-- 查询审批任务信息 -->
+    <!-- 查询单条审批任务信息 -->
+    <select id="getObject" resultType="cn.js.icode.config.data.AuditTask">
+        SELECT
+        TaskId, BizCode, BizNo, TaskIndex, PlanUserId, AttendFlag, ContinueFlag, StatusFlag, AuditUserId, AuditTime, PassFlag, AuditComment, CreateTime
+        FROM config_audit_task
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    TaskId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizCode != null and where.bizCode != ''">
+                        AND BizCode = #{where.bizCode}
+                    </if>
+	
+                    <if test="where != null and where.bizNo != null and where.bizNo != ''">
+                        AND BizNo = #{where.bizNo}
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="where != null and where.planUserId != null">
+                        AND PlanUserId = #{where.planUserId}
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.auditUserId != null">
+                        AND AuditUserId = #{where.auditUserId}
+                    </if>
+	
+                    <if test="where != null and where.auditTime != null">
+						<![CDATA[ AND AuditTime = DATE_FORMAT(#{where.auditTime}, '%Y-%m-%d') ]]>
+                    </if>
+	
+                    <if test="where != null and where.passFlag != null and where.passFlag">
+                        AND PassFlag = 1
+                    </if>
+                    <if test="where != null and where.passFlag != null and !where.passFlag">
+                        AND PassFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.auditComment != null and where.auditComment != ''">
+                        AND AuditComment = #{where.auditComment}
+                    </if>
+	
+                    <if test="where != null and where.createTime != null">
+						<![CDATA[ AND CreateTime = DATE_FORMAT(#{where.createTime}, '%Y-%m-%d') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY TaskId DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条审批任务信息 -->
+    <select id="list" resultType="cn.js.icode.config.data.AuditTask">
+        SELECT
+        TaskId, BizCode, BizNo, TaskIndex, PlanUserId, AttendFlag, ContinueFlag, StatusFlag, AuditUserId, AuditTime, PassFlag, AuditComment, CreateTime
+        FROM config_audit_task
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    TaskId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizCode != null and where.bizCode != ''">
+                        AND BizCode like concat('%', #{where.bizCode}, '%')
+                    </if>
+	
+                    <if test="where != null and where.bizNo != null and where.bizNo != ''">
+                        AND BizNo like concat('%', #{where.bizNo}, '%')
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="where != null and where.planUserId != null">
+                        AND PlanUserId = #{where.planUserId}
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.auditUserId != null">
+                        AND AuditUserId = #{where.auditUserId}
+                    </if>
+	
+                    <if test="where != null and where.auditTimeTop != null">
+						<![CDATA[ AND AuditTime <= DATE_FORMAT(#{where.auditTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.auditTimeBottom != null">
+						<![CDATA[ AND AuditTime >= DATE_FORMAT(#{where.auditTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.passFlag != null and where.passFlag">
+                        AND PassFlag = 1
+                    </if>
+                    <if test="where != null and where.passFlag != null and !where.passFlag">
+                        AND PassFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.auditComment != null and where.auditComment != ''">
+                        AND AuditComment like concat('%', #{where.auditComment}, '%')
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY TaskId
+        <if test="where != null and where.bizCode != null and where.bizCode != '' and where.bizNo != null and where.bizNo != ''">
+        ASC
+        </if>
+        <if test="where == null or where.bizCode == null or where.bizCode == '' or where.bizNo == null or where.bizNo == ''">
+        DESC
+        </if>        
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM config_audit_task
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    TaskId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizCode != null and where.bizCode != ''">
+                        AND BizCode like concat('%', #{where.bizCode}, '%')
+                    </if>
+	
+                    <if test="where != null and where.bizNo != null and where.bizNo != ''">
+                        AND BizNo like concat('%', #{where.bizNo}, '%')
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="where != null and where.planUserId != null">
+                        AND PlanUserId = #{where.planUserId}
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.auditUserId != null">
+                        AND AuditUserId = #{where.auditUserId}
+                    </if>
+	
+                    <if test="where != null and where.auditTimeTop != null">
+						<![CDATA[ AND AuditTime <= DATE_FORMAT(#{where.auditTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.auditTimeBottom != null">
+						<![CDATA[ AND AuditTime >= DATE_FORMAT(#{where.auditTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.passFlag != null and where.passFlag">
+                        AND PassFlag = 1
+                    </if>
+                    <if test="where != null and where.passFlag != null and !where.passFlag">
+                        AND PassFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.auditComment != null and where.auditComment != ''">
+                        AND AuditComment like concat('%', #{where.auditComment}, '%')
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO config_audit_task(TaskId, BizCode, BizNo, TaskIndex, PlanUserId, AttendFlag, ContinueFlag, StatusFlag, AuditUserId, AuditTime, PassFlag, AuditComment, CreateTime)
+        VALUES (
+        #{data.id}, 
+
+		#{data.bizCode}, 
+	
+		#{data.bizNo}, 
+	
+		#{data.taskIndex}, 
+	
+		#{data.planUserId}, 
+	
+		#{data.attendFlag}, 
+	
+		<if test="data.continueFlag == null">null, </if>
+		<if test="data.continueFlag != null and data.continueFlag">1, </if>
+		<if test="data.continueFlag != null and !data.continueFlag">0, </if>
+	
+		#{data.statusFlag}, 
+	
+		#{data.auditUserId}, 
+	
+		#{data.auditTime}, 
+	
+		<if test="data.passFlag == null">null, </if>
+		<if test="data.passFlag != null and data.passFlag">1, </if>
+		<if test="data.passFlag != null and !data.passFlag">0, </if>
+	
+		#{data.auditComment}, 
+	
+		#{data.createTime}
+	
+        )
+    </insert>
+
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE config_audit_task
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                TaskId = #{data.id},
+            </if>
+		
+			<if test="data.bizCode != null">
+				BizCode = #{data.bizCode},
+			</if>
+	
+			<if test="data.bizNo != null">
+				BizNo = #{data.bizNo},
+			</if>
+	
+			<if test="data.taskIndex != null">
+				TaskIndex = #{data.taskIndex},
+			</if>
+	
+			<if test="data.planUserId != null">
+				PlanUserId = #{data.planUserId},
+			</if>
+	
+			<if test="data.attendFlag != null">
+				AttendFlag = #{data.attendFlag},
+			</if>
+	
+			<if test="data.continueFlag != null and data.continueFlag">
+				ContinueFlag = 1,
+			</if>
+			<if test="data.continueFlag != null and !data.continueFlag">
+				ContinueFlag = 0,
+			</if>
+	
+			<if test="data.statusFlag != null">
+				StatusFlag = #{data.statusFlag},
+			</if>
+	
+			<if test="data.auditUserId != null">
+				AuditUserId = #{data.auditUserId},
+			</if>
+	
+            <if test="data.auditTime != null">
+                AuditTime = #{data.auditTime},
+            </if>		
+	
+			<if test="data.passFlag != null and data.passFlag">
+				PassFlag = 1,
+			</if>
+			<if test="data.passFlag != null and !data.passFlag">
+				PassFlag = 0,
+			</if>
+	
+			<if test="data.auditComment != null">
+				AuditComment = #{data.auditComment},
+			</if>
+	
+            <if test="data.createTime != null">
+                CreateTime = #{data.createTime},
+            </if>		
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    TaskId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizCode != null">
+                        AND BizCode = #{where.bizCode}
+                    </if>
+	
+                    <if test="where != null and where.bizNo != null">
+                        AND BizNo = #{where.bizNo}
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="where != null and where.planUserId != null">
+                        AND PlanUserId = #{where.planUserId}
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.auditUserId != null">
+                        AND AuditUserId = #{where.auditUserId}
+                    </if>
+	
+                    <if test="where != null and where.auditTimeTop != null">
+						<![CDATA[ AND AuditTime <= DATE_FORMAT(#{where.auditTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.auditTimeBottom != null">
+						<![CDATA[ AND AuditTime >= DATE_FORMAT(#{where.auditTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.passFlag != null and where.passFlag">
+                        AND PassFlag = 1
+                    </if>
+                    <if test="where != null and where.passFlag != null and !where.passFlag">
+                        AND PassFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.auditComment != null">
+                        AND AuditComment = #{where.auditComment}
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除审批任务信息 -->
+    <delete id="delete">
+        DELETE FROM config_audit_task
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    TaskId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.bizCode != null">
+                        AND BizCode = #{where.bizCode}
+                    </if>
+	
+                    <if test="where != null and where.bizNo != null">
+                        AND BizNo = #{where.bizNo}
+                    </if>
+	
+                    <if test="where != null and where.taskIndex != null">
+                        AND TaskIndex = #{where.taskIndex}
+                    </if>
+	
+                    <if test="where != null and where.planUserId != null">
+                        AND PlanUserId = #{where.planUserId}
+                    </if>
+	
+                    <if test="where != null and where.attendFlag != null">
+                        AND AttendFlag = #{where.attendFlag}
+                    </if>
+	
+                    <if test="where != null and where.continueFlag != null and where.continueFlag">
+                        AND ContinueFlag = 1
+                    </if>
+                    <if test="where != null and where.continueFlag != null and !where.continueFlag">
+                        AND ContinueFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.auditUserId != null">
+                        AND AuditUserId = #{where.auditUserId}
+                    </if>
+	
+                    <if test="where != null and where.auditTimeTop != null">
+						<![CDATA[ AND AuditTime <= DATE_FORMAT(#{where.auditTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.auditTimeBottom != null">
+						<![CDATA[ AND AuditTime >= DATE_FORMAT(#{where.auditTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="where != null and where.passFlag != null and where.passFlag">
+                        AND PassFlag = 1
+                    </if>
+                    <if test="where != null and where.passFlag != null and !where.passFlag">
+                        AND PassFlag = 0
+                    </if>
+	
+                    <if test="where != null and where.auditComment != null">
+                        AND AuditComment = #{where.auditComment}
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

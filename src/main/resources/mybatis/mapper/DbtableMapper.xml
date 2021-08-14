@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.tool.mapper.DbtableMapper">
+    <!-- 查询数据表信息 -->
+    <!-- 查询单条数据表信息 -->
+    <select id="getObject" resultType="cn.js.icode.tool.data.Dbtable">
+        SELECT
+        DbtableId, ProjectId, PackagePrefix, TableName, TableDescription, Workload, CreatorId, CreateTime
+        FROM tool_dbtable_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    DbtableId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND ProjectId = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.packagePrefix != null and where.packagePrefix != ''">
+                        AND PackagePrefix = #{where.packagePrefix}
+                    </if>
+	
+                    <if test="where != null and where.tableName != null and where.tableName != ''">
+                        AND TableName = #{where.tableName}
+                    </if>
+	
+                    <if test="where != null and where.tableDescription != null and where.tableDescription != ''">
+                        AND TableDescription = #{where.tableDescription}
+                    </if>
+	
+                    <if test="where != null and where.workload != null">
+                        AND Workload = #{where.workload}
+                    </if>
+	
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+	
+                    <if test="where != null and where.createTime != null">
+						<![CDATA[ AND CreateTime = DATE_FORMAT(#{where.createTime}, '%Y-%m-%d') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY DbtableId DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条数据表信息 -->
+    <select id="list" resultType="cn.js.icode.tool.data.Dbtable">
+        SELECT
+        DbtableId, ProjectId, PackagePrefix, TableName, TableDescription, Workload, CreatorId, CreateTime
+        FROM tool_dbtable_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    DbtableId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND ProjectId = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.packagePrefix != null and where.packagePrefix != ''">
+                        AND PackagePrefix like concat('%', #{where.packagePrefix}, '%')
+                    </if>
+	
+                    <if test="where != null and where.tableName != null and where.tableName != ''">
+                        AND TableName like concat('%', #{where.tableName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.tableDescription != null and where.tableDescription != ''">
+                        AND TableDescription like concat('%', #{where.tableDescription}, '%')
+                    </if>
+	
+                    <if test="where != null and where.workload != null">
+                        AND Workload = #{where.workload}
+                    </if>
+	
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY DbtableId DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM tool_dbtable_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    DbtableId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND ProjectId = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.packagePrefix != null and where.packagePrefix != ''">
+                        AND PackagePrefix like concat('%', #{where.packagePrefix}, '%')
+                    </if>
+	
+                    <if test="where != null and where.tableName != null and where.tableName != ''">
+                        AND TableName like concat('%', #{where.tableName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.tableDescription != null and where.tableDescription != ''">
+                        AND TableDescription like concat('%', #{where.tableDescription}, '%')
+                    </if>
+	
+                    <if test="where != null and where.workload != null">
+                        AND Workload = #{where.workload}
+                    </if>
+	
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO tool_dbtable_base(DbtableId, ProjectId, PackagePrefix, TableName, TableDescription, Workload, CreatorId, CreateTime)
+        VALUES (
+        #{data.id}, 
+
+		#{data.projectId}, 
+	
+		#{data.packagePrefix}, 
+	
+		#{data.tableName}, 
+	
+		#{data.tableDescription}, 
+	
+		#{data.workload}, 
+	
+		#{data.creatorId}, 
+	
+		#{data.createTime}
+	
+        )
+    </insert>
+
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE tool_dbtable_base
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                DbtableId = #{data.id},
+            </if>
+		
+			<if test="data.projectId != null">
+				ProjectId = #{data.projectId},
+			</if>
+	
+			<if test="data.packagePrefix != null">
+				PackagePrefix = #{data.packagePrefix},
+			</if>
+	
+			<if test="data.tableName != null">
+				TableName = #{data.tableName},
+			</if>
+	
+			<if test="data.tableDescription != null">
+				TableDescription = #{data.tableDescription},
+			</if>
+	
+			<if test="data.workload != null">
+				Workload = #{data.workload},
+			</if>
+	
+			<if test="data.creatorId != null">
+				CreatorId = #{data.creatorId},
+			</if>
+	
+            <if test="data.createTime != null">
+                CreateTime = #{data.createTime},
+            </if>		
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    DbtableId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND ProjectId = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.packagePrefix != null">
+                        AND PackagePrefix = #{where.packagePrefix}
+                    </if>
+	
+                    <if test="where != null and where.tableName != null">
+                        AND TableName = #{where.tableName}
+                    </if>
+	
+                    <if test="where != null and where.tableDescription != null">
+                        AND TableDescription = #{where.tableDescription}
+                    </if>
+	
+                    <if test="where != null and where.workload != null">
+                        AND Workload = #{where.workload}
+                    </if>
+	
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除数据表信息 -->
+    <delete id="delete">
+        DELETE FROM tool_dbtable_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    DbtableId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.projectId != null">
+                        AND ProjectId = #{where.projectId}
+                    </if>
+	
+                    <if test="where != null and where.packagePrefix != null">
+                        AND PackagePrefix = #{where.packagePrefix}
+                    </if>
+	
+                    <if test="where != null and where.tableName != null">
+                        AND TableName = #{where.tableName}
+                    </if>
+	
+                    <if test="where != null and where.tableDescription != null">
+                        AND TableDescription = #{where.tableDescription}
+                    </if>
+	
+                    <if test="where != null and where.workload != null">
+                        AND Workload = #{where.workload}
+                    </if>
+	
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+	
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

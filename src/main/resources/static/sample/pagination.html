@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+  <link rel="stylesheet" href="../layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../layuiadmin/style/admin.css" media="all">
+  <script language="javascript" src="../js/jquery-3.3.1.min.js"></script>
+  <script language="javascript" src="../js/jquery-icode.js"></script>
+</head>
+
+<body>
+<form id="fList" onsubmit="return false" method="post">
+
+	<div id="test-laypage-demo7"></div>
+
+<button onclick="showValue('pagination.pageNo');">查看值pagination.pageNo</button><br/>
+<button onclick="showValue('pagination.pageCount');">查看值pagination.pageCount</button><br/>
+<button onclick="showValue('pagination.recordCount');">查看值pagination.recordCount</button><br/>
+<button onclick="showValue('pagination.maxResults');">查看值pagination.maxResults</button>
+</form>
+</body>
+<script src="../layuiadmin/layui/layui.js"></script>
+<script>
+  layui.config({
+    base: '../layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'laypage'], function(){
+    var laypage = layui.laypage;
+    
+    //完整功能
+    laypage.render({
+      elem: 'test-laypage-demo7'
+      ,count: 104
+      ,limit: 20
+      ,curr:3
+      ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+      ,jump: function(obj){
+        console.log(obj);
+        // toPage(3);
+      }
+    });
+  });
+  
+  function showValue(name) {
+	  var ele = document.forms[0][name];
+	  if(ele == null) {
+		  alert(name + " is null");
+	  } else {
+		  alert(name + ".value is [" + ele.value + "]");
+	  }
+  }
+  </script>
+
+</html>

@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+	<form id="fView" class="layui-form" onsubmit="return false" action="##">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+  		<div class="layui-card">
+			<!-- 如需要header信息，放开下面的comment -->
+			<!-- <div class="layui-card-header">基础信息</div> -->
+			<div class="layui-card-body" style="padding: 15px;">
+				<!-- 如一行显示多列数据，参照下面的示例 -->
+				<!--
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">属性1：</label>
+						<div class="layui-input-inline">属性1对应数值</div>
+					</div>对应控件
+					<div class="layui-inline">
+						<label class="layui-form-label">属性2：</label>
+						<div class="layui-input-inline">属性1对应数值</div>
+					</div>
+				</div>
+				-->
+				<div class="layui-form-item">
+					<label class="layui-form-label">所属路径：</label>
+					<div class="layui-input-inline layui-form-mid">
+						<% if(has(pathList) && pathList != null){ for(i in pathList) {%>
+						<%if(!iLP.last) {%>${i.itemName} /<%}%>
+						<%if(iLP.last) {%>${i.itemName}<%}%>
+						<%}}%>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">选项编码：</label>
+						<div class="layui-input-inline">${@team.bangbang.common.utility.LogicUtility.getHTMLString(item.itemCode)}</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">选项名称：</label>
+						<div class="layui-input-inline">${@team.bangbang.common.utility.LogicUtility.getHTMLString(item.itemName)}</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">备注信息：</label>
+					<div class="layui-input-block">${@team.bangbang.common.utility.LogicUtility.getHTMLString(item.remark)}</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">子项数量：</label>
+					<div class="layui-input-inline layui-form-mid">${item.sonCount}</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+</body>
+<script>
+	layui.use(['form'], function(){
+        var form  = layui.form;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+</script>
+</html>

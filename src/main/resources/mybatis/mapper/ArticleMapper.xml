@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.website.mapper.ArticleMapper">
+    <!-- 查询信息发布信息 -->
+    <!-- 查询单条信息发布信息 -->
+    <select id="getObject" resultType="cn.js.icode.website.data.Article">
+        SELECT
+        ArticleId, CategoryCode, ImageUrl, Title, SubTitle, Content, StatusFlag, PosterName, UpdateTime
+        FROM website_article_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ArticleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.categoryCode != null and where.categoryCode != ''">
+                        AND CategoryCode = #{where.categoryCode}
+                    </if>
+	
+                    <if test="where != null and where.imageUrl != null and where.imageUrl != ''">
+                        AND ImageUrl = #{where.imageUrl}
+                    </if>
+	
+                    <if test="where != null and where.title != null and where.title != ''">
+                        AND Title = #{where.title}
+                    </if>
+	
+                    <if test="where != null and where.subTitle != null and where.subTitle != ''">
+                        AND SubTitle = #{where.subTitle}
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.posterName != null and where.posterName != ''">
+                        AND PosterName = #{where.posterName}
+                    </if>
+	
+                    <if test="where != null and where.updateTime != null">
+						<![CDATA[ AND UpdateTime = DATE_FORMAT(#{where.updateTime}, '%Y-%m-%d') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY ArticleId DESC limit 0, 1
+    </select>
+
+    <!-- 查询多条信息发布信息 -->
+    <select id="list" resultType="cn.js.icode.website.data.Article">
+        SELECT
+        ArticleId, CategoryCode, ImageUrl, Title, SubTitle, StatusFlag, PosterName, UpdateTime
+        FROM website_article_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ArticleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.categoryCode != null and where.categoryCode != ''">
+                        AND CategoryCode like concat('%', #{where.categoryCode}, '%')
+                    </if>
+	
+                    <if test="where != null and where.imageUrl != null and where.imageUrl != ''">
+                        AND ImageUrl like concat('%', #{where.imageUrl}, '%')
+                    </if>
+	
+                    <if test="where != null and where.title != null and where.title != ''">
+                        AND Title like concat('%', #{where.title}, '%')
+                    </if>
+	
+                    <if test="where != null and where.subTitle != null and where.subTitle != ''">
+                        AND SubTitle like concat('%', #{where.subTitle}, '%')
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.posterName != null and where.posterName != ''">
+                        AND PosterName like concat('%', #{where.posterName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.updateTimeTop != null">
+						<![CDATA[ AND UpdateTime <= DATE_FORMAT(#{where.updateTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.updateTimeBottom != null">
+						<![CDATA[ AND UpdateTime >= DATE_FORMAT(#{where.updateTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY ArticleId DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM website_article_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ArticleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.categoryCode != null and where.categoryCode != ''">
+                        AND CategoryCode like concat('%', #{where.categoryCode}, '%')
+                    </if>
+	
+                    <if test="where != null and where.imageUrl != null and where.imageUrl != ''">
+                        AND ImageUrl like concat('%', #{where.imageUrl}, '%')
+                    </if>
+	
+                    <if test="where != null and where.title != null and where.title != ''">
+                        AND Title like concat('%', #{where.title}, '%')
+                    </if>
+	
+                    <if test="where != null and where.subTitle != null and where.subTitle != ''">
+                        AND SubTitle like concat('%', #{where.subTitle}, '%')
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.posterName != null and where.posterName != ''">
+                        AND PosterName like concat('%', #{where.posterName}, '%')
+                    </if>
+	
+                    <if test="where != null and where.updateTimeTop != null">
+						<![CDATA[ AND UpdateTime <= DATE_FORMAT(#{where.updateTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.updateTimeBottom != null">
+						<![CDATA[ AND UpdateTime >= DATE_FORMAT(#{where.updateTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO website_article_base(ArticleId, CategoryCode, ImageUrl, Title, SubTitle, Content, StatusFlag, PosterName, UpdateTime)
+        VALUES (
+        #{data.id}, 
+
+		#{data.categoryCode}, 
+	
+		#{data.imageUrl}, 
+	
+		#{data.title}, 
+	
+		#{data.subTitle}, 
+	
+		#{data.content}, 
+	
+		#{data.statusFlag}, 
+	
+		#{data.posterName}, 
+	
+		#{data.updateTime}
+	
+        )
+    </insert>
+
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE website_article_base
+        <trim prefix="SET" suffixOverrides=",">
+		
+            <if test="data.id != null">
+                ArticleId = #{data.id},
+            </if>
+		
+			<if test="data.categoryCode != null">
+				CategoryCode = #{data.categoryCode},
+			</if>
+	
+			<if test="data.imageUrl != null">
+				ImageUrl = #{data.imageUrl},
+			</if>
+	
+			<if test="data.title != null">
+				Title = #{data.title},
+			</if>
+	
+			<if test="data.subTitle != null">
+				SubTitle = #{data.subTitle},
+			</if>
+	
+			<if test="data.content != null">
+				Content = #{data.content},
+			</if>
+	
+			<if test="data.statusFlag != null">
+				StatusFlag = #{data.statusFlag},
+			</if>
+	
+			<if test="data.posterName != null">
+				PosterName = #{data.posterName},
+			</if>
+	
+            <if test="data.updateTime != null">
+                UpdateTime = #{data.updateTime},
+            </if>		
+	
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ArticleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.categoryCode != null">
+                        AND CategoryCode = #{where.categoryCode}
+                    </if>
+	
+                    <if test="where != null and where.imageUrl != null">
+                        AND ImageUrl = #{where.imageUrl}
+                    </if>
+	
+                    <if test="where != null and where.title != null">
+                        AND Title = #{where.title}
+                    </if>
+	
+                    <if test="where != null and where.subTitle != null">
+                        AND SubTitle = #{where.subTitle}
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.posterName != null">
+                        AND PosterName = #{where.posterName}
+                    </if>
+	
+                    <if test="where != null and where.updateTimeTop != null">
+						<![CDATA[ AND UpdateTime <= DATE_FORMAT(#{where.updateTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.updateTimeBottom != null">
+						<![CDATA[ AND UpdateTime >= DATE_FORMAT(#{where.updateTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+
+    <!-- 删除信息发布信息 -->
+    <delete id="delete">
+        DELETE FROM website_article_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+			
+                <when test="where != null and where.id != null">
+                    ArticleId = #{where.id}
+                </when>
+			
+                <otherwise>
+
+                    <if test="where != null and where.categoryCode != null">
+                        AND CategoryCode = #{where.categoryCode}
+                    </if>
+	
+                    <if test="where != null and where.imageUrl != null">
+                        AND ImageUrl = #{where.imageUrl}
+                    </if>
+	
+                    <if test="where != null and where.title != null">
+                        AND Title = #{where.title}
+                    </if>
+	
+                    <if test="where != null and where.subTitle != null">
+                        AND SubTitle = #{where.subTitle}
+                    </if>
+	
+                    <if test="where != null and where.statusFlag != null">
+                        AND StatusFlag = #{where.statusFlag}
+                    </if>
+	
+                    <if test="where != null and where.posterName != null">
+                        AND PosterName = #{where.posterName}
+                    </if>
+	
+                    <if test="where != null and where.updateTimeTop != null">
+						<![CDATA[ AND UpdateTime <= DATE_FORMAT(#{where.updateTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.updateTimeBottom != null">
+						<![CDATA[ AND UpdateTime >= DATE_FORMAT(#{where.updateTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+	
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.system.mapper.MenuFunctionMapper">
+    <!-- 查询菜单功能信息 -->
+    <!-- 查询单条菜单功能信息 -->
+    <select id="getObject" resultType="cn.js.icode.system.data.MenuFunction">
+        SELECT
+        Id, MenuId, FunctionUrl, TypeFlag
+        FROM system_menu_function
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.functionUrl != null and where.functionUrl != ''">
+                        AND FunctionUrl = #{where.functionUrl}
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY TypeFlag, Id limit 0, 1
+    </select>
+    <!-- 查询多条菜单功能信息 -->
+    <select id="list" resultType="cn.js.icode.system.data.MenuFunction">
+        SELECT
+        Id, MenuId, FunctionUrl, TypeFlag
+        FROM system_menu_function
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.functionUrl != null and where.functionUrl != ''">
+                        AND FunctionUrl like concat('%', #{where.functionUrl}, '%')
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY TypeFlag, Id
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM system_menu_function
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.functionUrl != null and where.functionUrl != ''">
+                        AND FunctionUrl like concat('%', #{where.functionUrl}, '%')
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO system_menu_function(Id, MenuId, FunctionUrl, TypeFlag)
+        VALUES (
+        #{data.id},
+		#{data.menuId},
+		#{data.functionUrl},
+		#{data.typeFlag}
+        )
+    </insert>
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE system_menu_function
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="data.id != null">
+                Id = #{data.id},
+            </if>
+			<if test="data.menuId != null">
+				MenuId = #{data.menuId},
+			</if>
+			<if test="data.functionUrl != null">
+				FunctionUrl = #{data.functionUrl},
+			</if>
+			<if test="data.typeFlag != null">
+				TypeFlag = #{data.typeFlag},
+			</if>
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.functionUrl != null">
+                        AND FunctionUrl = #{where.functionUrl}
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+    <!-- 删除菜单功能信息 -->
+    <delete id="delete">
+        DELETE FROM system_menu_function
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    Id = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.menuId != null">
+                        AND MenuId = #{where.menuId}
+                    </if>
+                    <if test="where != null and where.functionUrl != null">
+                        AND FunctionUrl = #{where.functionUrl}
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

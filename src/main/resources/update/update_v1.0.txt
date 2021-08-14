@@ -1,0 +1,16 @@
+更新说明：
+商户、组织、配置参数、选项配置、角色、操作账户添加UpdateTime字段
+
+####################################
+	SQL更新:
+####################################
+alter table basis_partner_base add column UpdateTime datetime null comment '更新时间';
+alter table basis_organization_base add UpdateTime datetime null comment '更新时间';
+alter table config_item_base add UpdateTime datetime null comment '更新时间';
+alter table config_parameter_base add UpdateTime datetime null comment '更新时间';
+alter table system_role_base add UpdateTime datetime null comment '更新时间';
+alter table system_user_base add UpdateTime datetime null comment '更新时间';
+
+####################################
+	配置更新:
+####################################

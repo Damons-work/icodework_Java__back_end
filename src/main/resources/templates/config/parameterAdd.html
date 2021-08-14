@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+	<form id="fAdd" class="layui-form" action="#" onsubmit="return false" method="post">
+		<input type="hidden" id="dialogId" name="dialogId" value="${dialogId}"/>
+		<div class="layui-card">
+			<!-- 如需要header信息，放开下面的comment -->
+			<!-- <div class="layui-card-header">基础信息</div> -->
+			<div class="layui-card-body" style="padding: 15px;">
+				<!-- 如一行显示多列数据，参照下面的示例 -->
+				<!--
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">属性1：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">属性2：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>
+				</div>
+				-->
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">所属模块<span style="color:#FF5722;">*</span>：</label>
+						<div class="layui-input-inline">
+							<input type="text" name="parameter.module" placeholder="所属模块" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(parameter.module)}" autocomplete="off" class="layui-input" maxlength="25">
+						</div>
+					</div>
+						
+					<div class="layui-inline">
+						<label class="layui-form-label">参数名称<span style="color:#FF5722;">*</span>：</label>
+						<div class="layui-input-inline">
+							<input type="text" name="parameter.parameterName" placeholder="参数名称" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(parameter.parameterName)}" autocomplete="off" class="layui-input" maxlength="25">
+						</div>
+					</div>
+				</div>
+				
+				<div class="layui-form-item">
+					<label class="layui-form-label">参数数值<span style="color:#FF5722;">*</span>：</label>
+					<div class="layui-input-block">
+						<input type="text" name="parameter.parameterValue" placeholder="参数数值" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(parameter.parameterValue)}" autocomplete="off" class="layui-input" maxlength="25">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">参数说明：</label>
+					<div class="layui-input-block">
+						<input type="text" name="parameter.remark" placeholder="参数说明" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(parameter.remark)}" autocomplete="off" class="layui-input" maxlength="250">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="layui-form-item layui-layout-admin">
+			<div class="layui-input-block">
+				<div class="layui-footer" style="left: 0;">
+					<button class="layui-btn" onclick="doAddAction('parameter');">新 增</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+	function validate(theForm) {
+		// 注意：
+		// 如果更改页面表单的控件类型，请在校验判断时做对应修改：
+		// 1. 下拉框：使用 $.trim(theForm["控件名称"].value) == ""
+		// 2. 单选框/复选框：使用 getChoiceValue("控件名称") == null
+		//
+		if($.trim(theForm["parameter.module"].value) == "") {
+			$.message("所属模块不能为空！");
+			return false;
+		}
+		if($.trim(theForm["parameter.parameterName"].value) == "") {
+			$.message("参数名称不能为空！");
+			return false;
+		}
+		if($.trim(theForm["parameter.parameterValue"].value) == "") {
+			$.message("参数数值不能为空！");
+			return false;
+		}
+		return true;
+	}
+</script>
+</body>
+</html>

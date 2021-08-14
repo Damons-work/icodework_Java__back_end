@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8"/>
+    <%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+    %>
+    <style>
+        .layui-col-xs1{
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e2e2;
+            text-align: center;
+            line-height: 40px;
+            margin-left: 5px;
+            margin-top: 5px
+        }
+
+        .layui-col-xs1:hover{
+            width: 40px;
+            height: 40px;
+            border: 3px solid #2F4056;
+            text-align: center;
+            line-height: 40px;
+            margin-left: 5px;
+            margin-top: 5px
+        }
+
+        .layui-icon{
+            font-size: 20px;
+            color:black;
+            cursor:pointer;
+        }
+    </style>
+</head>
+
+<body>
+<div id="iconDiv" class="layui-container">
+    <input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+    <% if(has(iconList) && iconList != null){ for(i in iconList) {%>
+    <div class="layui-col-xs1 layui-col-sm1 layui-col-md1" onclick="doSelect('${i}');">
+        <i class="layui-icon ${i}"></i>
+    </div>
+    <%}}%>
+</div>
+</body>
+<script>
+    function doSelect(iconClass) {
+        var result = {"statusCode" : 100, "message" : "", "icon" : iconClass};
+        console.log(result);
+        returnDialog(result);
+    }
+</script>
+</html>

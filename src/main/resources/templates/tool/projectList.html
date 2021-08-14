@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" action="projectList.do" method="post">
+      <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">工程名称：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="project.projectName" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(project.projectName)}"
+								class="layui-input" style="width:158px" maxlength="50" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+	                <#canVisit uri="/tool/projectAdd.do">
+	                <a class="layui-btn layui-btn-warm" onclick="doAdd('工程', 'project', 1000, 450);">新增</a>
+	                </#canVisit>
+                </div>
+            </div>
+            <table class="layui-table">
+             <thead>
+             <tr>
+                <th width="30" class="center">序号</th>
+			  <th>工程名称</th>
+			  <th>工程说明</th>
+			  <th width="120" class="center">创建时间</th>
+			  <th>创建人</th>
+               <th width="100" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(projectList) && projectList != null && !isEmpty(projectList)){ for(i in projectList) {%>
+                <tr>
+	                <td><a href="javascript:doView('工程', 'project', 800, 450, '${i.id}');" style="color:#01AAED;">${i.id}</a></td>
+				  <td>${i.projectName}</td>
+				  <td>${i.remark}</td>
+				  <td>${i.createTime, "yyyy-MM-dd HH:ss"}</td>
+				  <td>${i.creator.userName}</td>
+	                <td>
+	                <#canVisit uri="/tool/projectUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('工程', 'project', 1000, 450, '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/tool/projectDelete.do">
+	                    <i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('工程', 'project', '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/tool/projectUpdate.do">
+	                    <i class="layui-icon layui-icon-table" title="表结构" style="cursor:pointer;font-size:20px;color:#2F4056;margin:5px;" onclick="showTable('${i.id}');"></i>
+	                </#canVisit>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        // 渲染表单radio、select、checkbox
+        form.render();
+		// 创建时间下限
+		laydate.render({
+			elem: '#createTimeBottom',
+			format: 'yyyy-MM-dd'
+		});
+		// 创建时间上限
+		laydate.render({
+			elem: '#createTimeTop',
+			format: 'yyyy-MM-dd'
+		});
+    });
+
+	function showTable(projectId) {
+		openDialog("数据库表 -&gt; 列表", getFullUrl("dbtableList.do?dbtable.projectId=" + projectId), 1200, 800);
+	}
+</script>
+</html>

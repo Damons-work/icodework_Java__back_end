@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}    
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" action="xxxxAuditTaskList.do" method="post" onsubmit="return false">
+      <div class="layui-card">
+        <div class="layui-card-body">
+
+			<input type="hidden" name="bizCode" value="${isEmpty(bizCode) ? '' : bizCode}"/>
+			
+            <div class="layui-form-item">
+				<div class="layui-input-inline">
+					<input type="radio" name="hasAudited" value="false" title="待审批"<% if(hasAudited == null || !hasAudited) {%> checked<%}%> lay-filter="changeQuery"/>
+					<input type="radio" name="hasAudited" value="true" title="已审批"<% if(hasAudited != null && hasAudited) {%> checked<%}%> lay-filter="changeQuery"/>
+				</div>
+            </div>
+
+            <table class="layui-table">
+             <thead>
+             <tr>
+	            <th>申请单属性1</th>
+	            <th>申请单属性2</th>
+	            <th>申请单属性……</th>
+	            <th>申请单属性N</th>
+                <th width="50" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(auditTaskList) && auditTaskList != null){ for(i in auditTaskList) {%>
+                <tr>
+	                <td>TODO:</td>
+			
+				  <td>TODO:</td>
+			
+				  <td>TODO:</td>
+			
+				  <td>TODO:</td>
+	              <td>
+				        <% if(!hasAudited) {%>
+		                <#canVisit uri="">
+		                    <i class="layui-icon layui-icon-edit" title="审批" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doAudit('${i.bizCode}', '${i.bizNo}');"></i>
+		                </#canVisit>
+		                <%}%>
+		                
+		                <% if(hasAudited) {%>
+		                <#canVisit uri="">
+		                    <i class="layui-icon layui-icon-file" title="查看审批详情" style="cursor:pointer;font-size:20px;color:#5FB878;margin:5px;" onclick="doView('${i.bizCode}', '${i.bizNo}');"></i>
+		                </#canVisit>
+		                <%}%>
+	              </td>	              
+                </tr>
+                <%}}%>
+              </tbody>
+            </table>
+        </div>
+
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>    
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        
+        form.on("radio(changeQuery)", function(data){
+        	submitForm();
+        });
+        
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+	
+	function doAudit(bizCode, bizNo) {
+		var url = getFullUrl("../sample/xxxxAudit.do?bizCode=" + bizCode + "&bizNo=" + bizNo);
+		openDialog('XXX申请单 -&gt; 审批', url, 1000, 700, function(result) {
+			// 审核成功后，刷新页面
+			if(result != null && result.statusCode == 200) {
+				submitForm();
+			}
+		});
+	}
+
+	// 显示业务单据的view
+	function doView(bizCode, bizNo) {
+		var url = getFullUrl("../sample/xxxxAuditView.do?bizCode=" + bizCode + "&bizNo=" + bizNo);
+	    // 打开对话框
+	    openDialog('XXXX审批查看', url, 1000, 700);
+	}
+</script>
+</html>

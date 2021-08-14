@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<%
+	include("/static/include/title.html"){}
+	include("/static/include/css.html"){}
+	include("/static/include/js.html"){}
+	%>
+</head>
+<body>
+<div class="layui-fluid">
+
+	<form id="fView" class="layui-form" action="#" onsubmit="return false" method="post">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+		<input type="hidden" name="role.id" value="${role.id}"/>
+
+		<div class="layui-card">
+			<div class="layui-card-header">基本信息</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<!-- 如一行显示多列数据，参照下面的示例 -->
+				<!--
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">属性1：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">属性2：</label>
+						<div class="layui-input-inline">
+							<input type="text" autocomplete="off" class="layui-input" maxlength="25" title="属性1对应控件">
+						</div>
+					</div>
+				</div>
+				-->
+				
+				<div class="layui-form-item">
+					<!--
+					<div class="layui-inline">
+						<label class="layui-form-label">角色类别：</label>
+						<div class="layui-input-inline layui-form-mid">${role.typeName}</div>
+					</div>
+					-->
+					<label class="layui-form-label">角色名称：</label>
+					<div class="layui-input-inline layui-form-mid">
+						${@team.bangbang.common.utility.LogicUtility.getHTMLString(role.roleName)}
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">角色说明：</label>
+					<div class="layui-input-block">${@team.bangbang.common.utility.LogicUtility.getHTMLString(role.remark)}</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">欢迎页地址</label>
+					<div class="layui-input-block"><a href="${@team.bangbang.common.utility.LogicUtility.getQuotedString(role.welcomePage)}" target="_blank">${@team.bangbang.common.utility.LogicUtility.getHTMLString(role.welcomePage)}</a></div>
+				</div>
+			</div>
+		</div>
+	</form>
+
+	<div class="layui-card">
+		<div class="layui-card-header">权限信息</div>
+		<div class="layui-card-body" id="permissionHeader" style="padding: 15px;">
+			<div class="layui-tab">
+				<ul class="layui-tab-title">
+					<% if(has(modules) && modules != null){ for(i in modules) {%>
+					<li id="menubg_${i.id}"<% if(iLP.index == 1) {%> class="layui-this"<%}%> onclick="showModule('${i.id}');">${i.name}</li>
+					<%}}%>
+				</ul>
+				<div class="layui-tab-content">
+					<div class="layui-tab-item layui-show">
+						<div id="cbxModule"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	// 禁用所有的CheckBox
+	function disabledCheckbox() {
+		// 获取所有checkbox
+		var cbs = document.getElementsByTagName("input");
+		if(cbs == null) return;
+		if(cbs.length == null) {
+			cbs.disabled = true;
+		}
+
+		//
+		for(var i = 0; i < cbs.length; i++) {
+			cbs[i].disabled = true;
+		}
+	}
+
+	// 用于临时存储模块checkbox群组的HTML字符串
+	var arrModule = new Array();
+	// 调用AJAX获取该角色在各个模块下的checkbox群组
+    var html = null;
+<% if(has(modules) && modules != null){ for(i in modules) {%>
+	$.ajax({
+		url: "../api/menu/getMenuStringForRole?roleId=${role.id}&moduleId=${i.id}",
+		async: false,
+		success:function(result) {
+			if(result.statusCode == null || result.statusCode != 200) return;
+			arrModule['${i.id}'] = $.trim(result.data);
+		}
+	});
+<%}}%>
+
+	// 当前的模块
+	var currModuleId = "${modules[0].id}";
+	function showModule(mId){
+    <% if(has(modules) && modules != null){ for(i in modules) {%>
+		document.getElementById("menubg_${i.id}").className = ("${i.id}" == mId) ? "layui-this" : "";
+	<%}}%>
+		// 如果临时存储区域有checkbox群组的HTML字符串
+		document.getElementById("cbxModule").innerHTML = arrModule[mId];
+		currModuleId = mId;
+
+		disabledCheckbox();
+	}
+
+    showModule(currModuleId);
+</script>
+</body>
+</html>

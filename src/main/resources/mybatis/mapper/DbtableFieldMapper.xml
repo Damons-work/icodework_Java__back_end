@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.tool.mapper.DbtableFieldMapper">
+    <!-- 查询数据表字段信息 -->
+    <!-- 查询单条数据表字段信息 -->
+    <select id="getObject" resultType="cn.js.icode.tool.data.DbtableField">
+        SELECT
+        FieldId, DbtableId, FieldName, FieldType, FieldLength, IsPk, IsNotNull, FieldDescription, OrderBy
+        FROM tool_dbtable_field
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    FieldId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.dbtableId != null">
+                        AND DbtableId = #{where.dbtableId}
+                    </if>
+                    <if test="where != null and where.fieldName != null and where.fieldName != ''">
+                        AND FieldName = #{where.fieldName}
+                    </if>
+                    <if test="where != null and where.fieldType != null and where.fieldType != ''">
+                        AND FieldType = #{where.fieldType}
+                    </if>
+                    <if test="where != null and where.fieldLength != null and where.fieldLength != ''">
+                        AND FieldLength = #{where.fieldLength}
+                    </if>
+                    <if test="where != null and where.isPk != null and where.isPk">
+                        AND IsPk = 1
+                    </if>
+                    <if test="where != null and where.isPk != null and !where.isPk">
+                        AND IsPk = 0
+                    </if>
+                    <if test="where != null and where.isNotNull != null and where.isNotNull">
+                        AND IsNotNull = 1
+                    </if>
+                    <if test="where != null and where.isNotNull != null and !where.isNotNull">
+                        AND IsNotNull = 0
+                    </if>
+                    <if test="where != null and where.fieldDescription != null and where.fieldDescription != ''">
+                        AND FieldDescription = #{where.fieldDescription}
+                    </if>
+                    <if test="where != null and where.orderBy != null">
+                        AND OrderBy = #{where.orderBy}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY FieldId limit 0, 1
+    </select>
+    <!-- 查询多条数据表字段信息 -->
+    <select id="list" resultType="cn.js.icode.tool.data.DbtableField">
+        SELECT
+        FieldId, DbtableId, FieldName, FieldType, FieldLength, IsPk, IsNotNull, FieldDescription, OrderBy
+        FROM tool_dbtable_field
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    FieldId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.dbtableId != null">
+                        AND DbtableId = #{where.dbtableId}
+                    </if>
+                    <if test="where != null and where.fieldName != null and where.fieldName != ''">
+                        AND FieldName like concat('%', #{where.fieldName}, '%')
+                    </if>
+                    <if test="where != null and where.fieldType != null and where.fieldType != ''">
+                        AND FieldType like concat('%', #{where.fieldType}, '%')
+                    </if>
+                    <if test="where != null and where.fieldLength != null and where.fieldLength != ''">
+                        AND FieldLength like concat('%', #{where.fieldLength}, '%')
+                    </if>
+                    <if test="where != null and where.isPk != null and where.isPk">
+                        AND IsPk = 1
+                    </if>
+                    <if test="where != null and where.isPk != null and !where.isPk">
+                        AND IsPk = 0
+                    </if>
+                    <if test="where != null and where.isNotNull != null and where.isNotNull">
+                        AND IsNotNull = 1
+                    </if>
+                    <if test="where != null and where.isNotNull != null and !where.isNotNull">
+                        AND IsNotNull = 0
+                    </if>
+                    <if test="where != null and where.fieldDescription != null and where.fieldDescription != ''">
+                        AND FieldDescription like concat('%', #{where.fieldDescription}, '%')
+                    </if>
+                    <if test="where != null and where.orderBy != null">
+                        AND OrderBy = #{where.orderBy}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY FieldId
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM tool_dbtable_field
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    FieldId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.dbtableId != null">
+                        AND DbtableId = #{where.dbtableId}
+                    </if>
+                    <if test="where != null and where.fieldName != null and where.fieldName != ''">
+                        AND FieldName like concat('%', #{where.fieldName}, '%')
+                    </if>
+                    <if test="where != null and where.fieldType != null and where.fieldType != ''">
+                        AND FieldType like concat('%', #{where.fieldType}, '%')
+                    </if>
+                    <if test="where != null and where.fieldLength != null and where.fieldLength != ''">
+                        AND FieldLength like concat('%', #{where.fieldLength}, '%')
+                    </if>
+                    <if test="where != null and where.isPk != null and where.isPk">
+                        AND IsPk = 1
+                    </if>
+                    <if test="where != null and where.isPk != null and !where.isPk">
+                        AND IsPk = 0
+                    </if>
+                    <if test="where != null and where.isNotNull != null and where.isNotNull">
+                        AND IsNotNull = 1
+                    </if>
+                    <if test="where != null and where.isNotNull != null and !where.isNotNull">
+                        AND IsNotNull = 0
+                    </if>
+                    <if test="where != null and where.fieldDescription != null and where.fieldDescription != ''">
+                        AND FieldDescription like concat('%', #{where.fieldDescription}, '%')
+                    </if>
+                    <if test="where != null and where.orderBy != null">
+                        AND OrderBy = #{where.orderBy}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO tool_dbtable_field(FieldId, DbtableId, FieldName, FieldType, FieldLength, IsPk, IsNotNull, FieldDescription, OrderBy)
+        VALUES (
+        #{data.id},
+		#{data.dbtableId},
+		#{data.fieldName},
+		#{data.fieldType},
+		#{data.fieldLength},
+		<if test="data.isPk == null">null, </if>
+		<if test="data.isPk != null and data.isPk">1, </if>
+		<if test="data.isPk != null and !data.isPk">0, </if>
+		<if test="data.isNotNull == null">null, </if>
+		<if test="data.isNotNull != null and data.isNotNull">1, </if>
+		<if test="data.isNotNull != null and !data.isNotNull">0, </if>
+		#{data.fieldDescription},
+		#{data.orderBy}
+        )
+    </insert>
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE tool_dbtable_field
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="data.id != null">
+                FieldId = #{data.id},
+            </if>
+			<if test="data.dbtableId != null">
+				DbtableId = #{data.dbtableId},
+			</if>
+			<if test="data.fieldName != null">
+				FieldName = #{data.fieldName},
+			</if>
+			<if test="data.fieldType != null">
+				FieldType = #{data.fieldType},
+			</if>
+			<if test="data.fieldLength != null">
+				FieldLength = #{data.fieldLength},
+			</if>
+			<if test="data.isPk != null and data.isPk">
+				IsPk = 1,
+			</if>
+			<if test="data.isPk != null and !data.isPk">
+				IsPk = 0,
+			</if>
+			<if test="data.isNotNull != null and data.isNotNull">
+				IsNotNull = 1,
+			</if>
+			<if test="data.isNotNull != null and !data.isNotNull">
+				IsNotNull = 0,
+			</if>
+			<if test="data.fieldDescription != null">
+				FieldDescription = #{data.fieldDescription},
+			</if>
+			<if test="data.orderBy != null">
+				OrderBy = #{data.orderBy},
+			</if>
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    FieldId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.dbtableId != null">
+                        AND DbtableId = #{where.dbtableId}
+                    </if>
+                    <if test="where != null and where.fieldName != null">
+                        AND FieldName = #{where.fieldName}
+                    </if>
+                    <if test="where != null and where.fieldType != null">
+                        AND FieldType = #{where.fieldType}
+                    </if>
+                    <if test="where != null and where.fieldLength != null">
+                        AND FieldLength = #{where.fieldLength}
+                    </if>
+                    <if test="where != null and where.isPk != null and where.isPk">
+                        AND IsPk = 1
+                    </if>
+                    <if test="where != null and where.isPk != null and !where.isPk">
+                        AND IsPk = 0
+                    </if>
+                    <if test="where != null and where.isNotNull != null and where.isNotNull">
+                        AND IsNotNull = 1
+                    </if>
+                    <if test="where != null and where.isNotNull != null and !where.isNotNull">
+                        AND IsNotNull = 0
+                    </if>
+                    <if test="where != null and where.fieldDescription != null">
+                        AND FieldDescription = #{where.fieldDescription}
+                    </if>
+                    <if test="where != null and where.orderBy != null">
+                        AND OrderBy = #{where.orderBy}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+    <!-- 删除数据表字段信息 -->
+    <delete id="delete">
+        DELETE FROM tool_dbtable_field
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    FieldId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.dbtableId != null">
+                        AND DbtableId = #{where.dbtableId}
+                    </if>
+                    <if test="where != null and where.fieldName != null">
+                        AND FieldName = #{where.fieldName}
+                    </if>
+                    <if test="where != null and where.fieldType != null">
+                        AND FieldType = #{where.fieldType}
+                    </if>
+                    <if test="where != null and where.fieldLength != null">
+                        AND FieldLength = #{where.fieldLength}
+                    </if>
+                    <if test="where != null and where.isPk != null and where.isPk">
+                        AND IsPk = 1
+                    </if>
+                    <if test="where != null and where.isPk != null and !where.isPk">
+                        AND IsPk = 0
+                    </if>
+                    <if test="where != null and where.isNotNull != null and where.isNotNull">
+                        AND IsNotNull = 1
+                    </if>
+                    <if test="where != null and where.isNotNull != null and !where.isNotNull">
+                        AND IsNotNull = 0
+                    </if>
+                    <if test="where != null and where.fieldDescription != null">
+                        AND FieldDescription = #{where.fieldDescription}
+                    </if>
+                    <if test="where != null and where.orderBy != null">
+                        AND OrderBy = #{where.orderBy}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

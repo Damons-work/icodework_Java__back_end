@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" method="post">
+      <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">角色名称：</label>
+                    <div class="layui-input-inline">
+						<input type="text" name="role.roleName" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(role.roleName)}"
+								class="layui-input" style="width:158px" maxlength="25" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+                <!-- 
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">类别：</label>
+                    <div class="layui-input-inline">
+						<select name="role.typeFlag" style="width:150px" onchange="changeQuery();">
+							<option value="">--请选择--</option>
+							<% if(has(typeList) && typeList != null) { for(i in typeList) {%>
+							<option value="${i.key}"<% if(role.typeFlag == i.key) {%> selected<%}%>>${i.value}</option>
+							<%}}%>
+						</select>
+					</div>
+                </div>
+                -->
+                <div class="layui-inline">
+	                <a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+	                <#canVisit uri="/system/roleAdd.do">
+	                <a class="layui-btn layui-btn-warm" onclick="doAdd('角色', 'role', 1000, 800);">新增</a>
+	                </#canVisit>
+                </div>
+            </div>
+            <table class="layui-table">
+             <thead>
+             <tr>
+                <th width="30" class="center">序号</th>
+		  <th>角色名称</th>
+		  <!-- 
+		  <th width="80" class="center">类别</th>
+		  -->
+		  <th>角色说明</th>
+		  <th width="80">用户数量</th>
+		  <th>欢迎页地址</th>
+                <th width="80" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(roleList) && roleList != null && !isEmpty(roleList)){ for(i in roleList) {%>
+                <tr>
+	                <td><a href="javascript:doView('角色', 'role', 1000, 800, '${i.id}');" style="color:#01AAED;">${i.id}</a></td>
+				  <td>${i.roleName}</td>
+				  <!-- 
+				  <td>${i.typeName}</td>
+				  -->
+				  <td>${i.remark}</td>
+				  <td>${i.userCount}</td>
+				  <td><a href="${@team.bangbang.common.utility.LogicUtility.getQuotedString(i.welcomePage)}" target="_blank">${@team.bangbang.common.utility.LogicUtility.getHTMLString(i.welcomePage)}</a></td>
+	                <td>
+	                <#canVisit uri="/system/roleUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('角色', 'role', 1000, 800, '${i.id}');"></i>
+	                </#canVisit>
+	                <#canVisit uri="/system/roleDelete.do">
+	                    <i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('角色', 'role', '${i.id}');"></i>
+	                </#canVisit>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+</script>
+</html>

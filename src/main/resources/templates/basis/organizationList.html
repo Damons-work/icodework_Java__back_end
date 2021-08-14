@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+</head>
+<body>
+<div class="layui-fluid">
+   <form class="layui-form" method="post">
+      <input type="hidden" name="organization.parentId" value="${organization.parentId}"/>
+      <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">类型：</label>
+                    <div class="layui-input-inline">
+						<select name="organization.typeFlag" style="width:150px" onchange="changeQuery();">
+							<option value="">--请选择--</option>
+							<% if(has(typeList) && typeList != null) { for(i in typeList) {%>
+							<option value="${i.key}"<% if(organization.typeFlag == i.key) {%> selected<%}%>>${i.value}</option>
+							<%}}%>
+						</select>
+					</div>
+                </div>
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">组织编码：</label>
+                    <div class="layui-input-inline">
+						<input type="text" id="orgCode" name="organization.organizationCode" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(organization.organizationCode)}"
+							   class="layui-input" style="width:158px" maxlength="5" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">组织名称：</label>
+                    <div class="layui-input-inline">
+						<input type="text" id="orgName" name="organization.organizationName" value="${@team.bangbang.common.utility.LogicUtility.getQuotedString(organization.organizationName)}"
+								class="layui-input" style="width:158px" maxlength="50" onchange="changeQuery();" onkeydown="enterIn(event);"/>
+					</div>
+                </div>
+		  		<div class="layui-inline">
+                    <label class="layui-form-label">有效标识：</label>
+                    <div class="layui-input-inline">
+						<input type="radio" name="organization.activeFlag" value="true" title="有效"<% if(organization.activeFlag != null && organization.activeFlag) {%> checked<%}%>/>
+						<input type="radio" name="organization.activeFlag" value="false" title="无效"<% if(organization.activeFlag == null || !organization.activeFlag) {%> checked<%}%>/>
+					</div>
+                </div>
+				<div class="layui-inline">
+					<a class="layui-btn layui-btn-normal" onclick="submitForm();">查询</a>
+					<#canVisit uri="/basis/organizationAdd.do">
+						<a class="layui-btn layui-btn-warm" onclick="doAdd('组织机构', 'organization', 800, 600);">新增</a>
+					</#canVisit>
+				</div>
+            </div>
+			<div class="layui-inline">
+				<label class="layui-form-label">父级组织：</label>
+				<div class="layui-input-inline layui-form-mid">
+					<% if(has(parents) && parents != null){ for(i in parents) {%>
+					<%if(!iLP.last) {%><a href="javascript:;" onclick="changeParent('${i.id}');" style='color: #1E9FFF;'>${i.organizationName}</a> /<%}%>
+					<%if(iLP.last) {%>${i.organizationName}<%}%>
+					<%}}%>
+				</div>
+			</div>
+            <table class="layui-table">
+             <thead>
+             <tr>
+                <th width="30" class="center">序号</th>
+			  <th width="80" class="center">类型</th>
+			  <th width="100" class="center">组织编码</th>
+			  <th>组织名称</th>
+			  <th>简称</th>
+			  <th width="80">有效标识</th>
+				 <th width="60">子组织</th>
+                <th width="60" class="center">操作</th>
+             </tr>
+             </thead>
+              <tbody>
+            <% if(has(organizationList) && organizationList != null && !isEmpty(organizationList)){ for(i in organizationList) {%>
+                <tr>
+	                <td><a href="javascript:doView('组织机构', 'organization', 800, 600, '${i.id}');" style="color:#01AAED;">${i.id}</a></td>
+				  <td>${i.typeName}</td>
+				  <td>${i.organizationCode}</td>
+				  <td>${i.organizationName}</td>
+				  <td>${i.briefName}</td>
+				  <td>
+					<% if(i.activeFlag != null && i.activeFlag) {%>有效<%}%>
+					<% if(i.activeFlag != null && !i.activeFlag) {%>无效<%}%>
+				  </td>
+					<td>
+						<a href="javascript:;" onclick="changeParent('${i.id}');"><i class="layui-icon layui-icon-list" style='font-size: 20px; color: #1E9FFF;'></i></a></td>
+	                <td align="center">
+	                <#canVisit uri="/basis/organizationUpdate.do">
+	                    <i class="layui-icon layui-icon-edit" title="修改" style="cursor:pointer;font-size:20px;color:#FFB800;margin:5px;" onclick="doUpdate('组织机构', 'organization', 800, 600, '${i.id}');"></i>
+					</#canVisit>
+					<#canVisit uri="/basis/organizationDelete.do">
+						<!--
+	                    <i class="layui-icon layui-icon-delete" title="删除" style="cursor:pointer;font-size:20px;color:#01AAED;margin:5px;" onclick="doDelete('组织机构', 'organization', '${i.id}');">删除</i>
+	                    -->
+	                </#canVisit>
+	                </td>
+                </tr>
+                <%}} else {%>
+                <tr>
+                	<td style='height: 35px;color: #999;text-align: center;' colspan='100%'>无数据</td>
+                </tr>
+                <%}%>
+              </tbody>
+            </table>
+        </div>
+        <div id="pagination" recordCount="${pagination.recordCount}" pageNo="${pagination.pageNo}" pageSize="${pagination.maxResults}"></div>
+      </div>
+   </form>
+</div>
+</body>
+<script>
+	layui.use(['form','laydate'], function(){
+        var form  = layui.form;
+        var laydate = layui.laydate;
+        // 渲染表单radio、select、checkbox
+        form.render();
+    });
+
+	function changeParent(pId) {
+	    if(pId == null || $.trim(pId) == "") return;
+	    selectOption(document.forms[0]["organization.typeFlag"], "");
+	    $("#orgCode").val("");
+	    $("#orgName").val("");
+		document.forms[0]["organization.parentId"].value = pId;
+		toPage(1);
+	}
+
+    //====================== 新增页面 ===========================
+    function doAdd(unitCh, unitEn, width, height) {
+	    // 父级组织节点
+		var pId = document.forms[0]["organization.parentId"].value;
+	    
+	    var url = getFullUrl(unitEn +"Add.do?organization.parentId=" + pId);
+        // 打开对话框
+        openDialog(unitCh + '新增', url, width, height, function(result) {
+            // 成功执行（result.statusCode == 200）后的回调函数
+            submitForm();
+        });
+    }
+</script>
+</html>

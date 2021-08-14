@@ -1,0 +1,24 @@
+更新说明：
+1. 添加信息发布
+2. 使用icode-common.java v6.6.2
+
+
+####################################
+	SQL更新:
+####################################
+CREATE TABLE `website_article_base`  (
+  `ArticleId` bigint(20) primary key,
+  `CategoryCode` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '分类编码，关联config_item_base.ItemCode[Category=信息分类]',
+  `ImageUrl` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `Title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `SubTitle` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT '副标题或者摘要',
+  `Content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `StatusFlag` tinyint(4) NOT NULL COMMENT '状态标识{1：待上架2：已上架}',
+  `PosterName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '发布人',
+  `UpdateTime` datetime NOT NULL COMMENT '更新时间'
+) ENGINE = InnoDB CHARACTER SET = utf8mb4;
+
+
+####################################
+	配置更新:
+####################################

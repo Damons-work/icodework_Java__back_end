@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.oAuth.weixin.mapper.AuthorizerGrantMapper">
+    <!-- 查询公众号/小程序授权信息信息 -->
+    <!-- 查询单条公众号/小程序授权信息信息 -->
+    <select id="getObject" resultType="cn.js.icode.oAuth.weixin.data.AuthorizerGrant">
+        SELECT
+        GrantId, AuthorizerId, AuthorizerName, HeadImage, RefreshToken, GrantTime
+        FROM weixin_authorizer_grant
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null and where.id != ''">
+                    GrantId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.authorizerId != null and where.authorizerId != ''">
+                        AND AuthorizerId = #{where.authorizerId}
+                    </if>
+                    <if test="where != null and where.authorizerName != null and where.authorizerName != ''">
+                        AND AuthorizerName = #{where.authorizerName}
+                    </if>
+                    <if test="where != null and where.headImage != null and where.headImage != ''">
+                        AND HeadImage = #{where.headImage}
+                    </if>
+                    <if test="where != null and where.refreshToken != null and where.refreshToken != ''">
+                        AND RefreshToken = #{where.refreshToken}
+                    </if>
+                    <if test="where != null and where.grantTime != null">
+						<![CDATA[ AND GrantTime = DATE_FORMAT(#{where.grantTime}, '%Y-%m-%d') ]]>
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY GrantId DESC limit 0, 1
+    </select>
+    <!-- 查询多条公众号/小程序授权信息信息 -->
+    <select id="list" resultType="cn.js.icode.oAuth.weixin.data.AuthorizerGrant">
+        SELECT
+        GrantId, AuthorizerId, AuthorizerName, HeadImage, RefreshToken, GrantTime
+        FROM weixin_authorizer_grant
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null and where.id != ''">
+                    GrantId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.authorizerId != null and where.authorizerId != ''">
+                        AND AuthorizerId = #{where.authorizerId}
+                    </if>
+                    <if test="where != null and where.authorizerName != null and where.authorizerName != ''">
+                        AND AuthorizerName like "%"#{where.authorizerName}"%"
+                    </if>
+                    <if test="where != null and where.headImage != null and where.headImage != ''">
+                        AND HeadImage like "%"#{where.headImage}"%"
+                    </if>
+                    <if test="where != null and where.refreshToken != null and where.refreshToken != ''">
+                        AND RefreshToken like "%"#{where.refreshToken}"%"
+                    </if>
+                    <if test="where != null and where.grantTimeTop != null">
+						<![CDATA[ AND GrantTime <= DATE_FORMAT(#{where.grantTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.grantTimeBottom != null">
+						<![CDATA[ AND GrantTime >= DATE_FORMAT(#{where.grantTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY GrantId DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM weixin_authorizer_grant
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null and where.id != ''">
+                    GrantId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.authorizerId != null and where.authorizerId != ''">
+                        AND AuthorizerId = #{where.authorizerId}
+                    </if>
+                    <if test="where != null and where.authorizerName != null and where.authorizerName != ''">
+                        AND AuthorizerName like "%"#{where.authorizerName}"%"
+                    </if>
+                    <if test="where != null and where.headImage != null and where.headImage != ''">
+                        AND HeadImage like "%"#{where.headImage}"%"
+                    </if>
+                    <if test="where != null and where.refreshToken != null and where.refreshToken != ''">
+                        AND RefreshToken like "%"#{where.refreshToken}"%"
+                    </if>
+                    <if test="where != null and where.grantTimeTop != null">
+						<![CDATA[ AND GrantTime <= DATE_FORMAT(#{where.grantTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.grantTimeBottom != null">
+						<![CDATA[ AND GrantTime >= DATE_FORMAT(#{where.grantTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO weixin_authorizer_grant(GrantId, AuthorizerId, AuthorizerName, HeadImage, RefreshToken, GrantTime)
+        VALUES (
+        #{data.id},
+		#{data.authorizerId},
+		#{data.authorizerName},
+		#{data.headImage},
+		#{data.refreshToken},
+		#{data.grantTime}
+        )
+    </insert>
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE weixin_authorizer_grant
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="data.id != null and data.id != ''">
+                GrantId = #{data.id},
+            </if>
+			<if test="data.authorizerId != null">
+				AuthorizerId = #{data.authorizerId},
+			</if>
+			<if test="data.authorizerName != null">
+				AuthorizerName = #{data.authorizerName},
+			</if>
+			<if test="data.headImage != null">
+				HeadImage = #{data.headImage},
+			</if>
+			<if test="data.refreshToken != null">
+				RefreshToken = #{data.refreshToken},
+			</if>
+		GrantTime = #{data.grantTime},
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null and where.id != ''">
+                    GrantId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.authorizerId != null">
+                        AND AuthorizerId = #{where.authorizerId}
+                    </if>
+                    <if test="where != null and where.authorizerName != null">
+                        AND AuthorizerName = #{where.authorizerName}
+                    </if>
+                    <if test="where != null and where.headImage != null">
+                        AND HeadImage = #{where.headImage}
+                    </if>
+                    <if test="where != null and where.refreshToken != null">
+                        AND RefreshToken = #{where.refreshToken}
+                    </if>
+                    <if test="where != null and where.grantTimeTop != null">
+						<![CDATA[ AND GrantTime <= DATE_FORMAT(#{where.grantTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.grantTimeBottom != null">
+						<![CDATA[ AND GrantTime >= DATE_FORMAT(#{where.grantTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+    <!-- 删除公众号/小程序授权信息信息 -->
+    <delete id="delete">
+        DELETE FROM weixin_authorizer_grant
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null and where.id != ''">
+                    GrantId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.authorizerId != null">
+                        AND AuthorizerId = #{where.authorizerId}
+                    </if>
+                    <if test="where != null and where.authorizerName != null">
+                        AND AuthorizerName = #{where.authorizerName}
+                    </if>
+                    <if test="where != null and where.headImage != null">
+                        AND HeadImage = #{where.headImage}
+                    </if>
+                    <if test="where != null and where.refreshToken != null">
+                        AND RefreshToken = #{where.refreshToken}
+                    </if>
+                    <if test="where != null and where.grantTimeTop != null">
+						<![CDATA[ AND GrantTime <= DATE_FORMAT(#{where.grantTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.grantTimeBottom != null">
+						<![CDATA[ AND GrantTime >= DATE_FORMAT(#{where.grantTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

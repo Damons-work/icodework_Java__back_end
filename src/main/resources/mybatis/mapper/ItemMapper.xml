@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.config.mapper.ItemMapper">
+    <!-- 查询选项配置信息 -->
+    <!-- 查询单条选项配置信息 -->
+    <select id="getObject" resultType="cn.js.icode.config.data.Item">
+        SELECT
+        ItemId, ParentId, ItemCode, ItemName, Category, Remark, SonCount
+        FROM config_item_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.itemCode != null and where.itemCode != ''">
+                        AND ItemCode = #{where.itemCode}
+                    </if>
+                    <if test="where != null and where.itemName != null and where.itemName != ''">
+                        AND ItemName = #{where.itemName}
+                    </if>
+                    <if test="where != null and where.category != null and where.category != ''">
+                        AND Category = #{where.category}
+                    </if>
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark = #{where.remark}
+                    </if>
+                    <if test="where != null and where.sonCount != null">
+                        AND SonCount = #{where.sonCount}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY ItemCode limit 0, 1
+    </select>
+    <!-- 查询多条选项配置信息 -->
+    <select id="list" resultType="cn.js.icode.config.data.Item">
+        SELECT
+        ItemId, ParentId, ItemCode, ItemName, Category, Remark, SonCount
+        FROM config_item_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.itemCode != null and where.itemCode != ''">
+                        AND ItemCode = #{where.itemCode}
+                    </if>
+                    <if test="where != null and where.itemName != null and where.itemName != ''">
+                        AND ItemName like concat('%', #{where.itemName}, '%')
+                    </if>
+                    <if test="where != null and where.category != null and where.category != ''">
+                        AND Category = #{where.category}
+                    </if>
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark like concat('%', #{where.remark}, '%')
+                    </if>
+                    <if test="where != null and where.sonCount != null">
+                        AND SonCount = #{where.sonCount}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY ItemCode
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM config_item_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.itemCode != null and where.itemCode != ''">
+                        AND ItemCode like concat('%', #{where.itemCode}, '%')
+                    </if>
+                    <if test="where != null and where.itemName != null and where.itemName != ''">
+                        AND ItemName like concat('%', #{where.itemName}, '%')
+                    </if>
+                    <if test="where != null and where.category != null and where.category != ''">
+                        AND Category like concat('%', #{where.category}, '%')
+                    </if>
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark like concat('%', #{where.remark}, '%')
+                    </if>
+                    <if test="where != null and where.sonCount != null">
+                        AND SonCount = #{where.sonCount}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO config_item_base(ItemId, ParentId, ItemCode, ItemName, Category, Remark, SonCount, UpdateTime)
+        VALUES (
+        #{data.id},
+		#{data.parentId},
+		#{data.itemCode},
+		#{data.itemName},
+		#{data.category},
+		#{data.remark},
+		#{data.sonCount},
+		now()
+        )
+    </insert>
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE config_item_base
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="data.id != null">
+                ItemId = #{data.id},
+            </if>
+			<if test="data.parentId != null">
+				ParentId = #{data.parentId},
+			</if>
+			<if test="data.itemCode != null">
+				ItemCode = #{data.itemCode},
+			</if>
+			<if test="data.itemName != null">
+				ItemName = #{data.itemName},
+			</if>
+			<if test="data.category != null">
+				Category = #{data.category},
+			</if>
+			<if test="data.remark != null">
+				Remark = #{data.remark},
+			</if>
+			<if test="data.sonCount != null">
+				SonCount = #{data.sonCount},
+			</if>
+	
+			UpdateTime = now()
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.itemCode != null">
+                        AND ItemCode = #{where.itemCode}
+                    </if>
+                    <if test="where != null and where.itemName != null">
+                        AND ItemName = #{where.itemName}
+                    </if>
+                    <if test="where != null and where.category != null">
+                        AND Category = #{where.category}
+                    </if>
+                    <if test="where != null and where.remark != null">
+                        AND Remark = #{where.remark}
+                    </if>
+                    <if test="where != null and where.sonCount != null">
+                        AND SonCount = #{where.sonCount}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+    <!-- 删除选项配置信息 -->
+    <delete id="delete">
+        DELETE FROM config_item_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ItemId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.itemCode != null">
+                        AND ItemCode = #{where.itemCode}
+                    </if>
+                    <if test="where != null and where.itemName != null">
+                        AND ItemName = #{where.itemName}
+                    </if>
+                    <if test="where != null and where.category != null">
+                        AND Category = #{where.category}
+                    </if>
+                    <if test="where != null and where.remark != null">
+                        AND Remark = #{where.remark}
+                    </if>
+                    <if test="where != null and where.sonCount != null">
+                        AND SonCount = #{where.sonCount}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+    
+    <!-- 查询分类列表 -->
+    <select id="getCategoryList" resultType="string">
+        SELECT Category FROM config_item_base group by Category order by Category
+    </select>
+</mapper>

@@ -1,0 +1,8 @@
+更新说明：
+* 代码生成中添加工作量评估字段
+	
+####################################
+	SQL更新:
+####################################
+alter table tool_dbtable_base add Workload double(8,2) null comment '评估基本工作量(人.天)' after TableDescription;
+alter table tool_dbtable_base modify CreatorId bigint not null comment '创建人编号，关联system_user_base.UserId';

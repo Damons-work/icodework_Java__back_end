@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<%
+    include("/static/include/title.html"){}
+    include("/static/include/css.html"){}
+    include("/static/include/js.html"){}
+%>
+<script language="JavaScript">
+// 点击分类时，调用此函数
+function onCategoryClick(category) {
+	try {
+		parent.onCategoryClick(category);
+	} catch (e) {
+		var msg = e.description || e.message;
+		alert("请在Frame框架中添加onCategoryClick(category)脚本函数用于处理选择后事务！\n错误信息：" + msg);
+	}
+}
+
+function addCategory() {
+	var optValue = prompt('请输入新的分类：', '');
+	
+	if(optValue == null) return;
+	
+	optValue = $.trim(optValue);
+	
+	if(optValue == "") {
+		alert("不能用空值创建新的分类！");
+		return;
+	}
+
+	// check whether the category exist
+	var nodes = $('#divCat').children();
+	for(var i = 0; nodes != null && i < nodes.length; i++) {
+		var node =$(nodes[i]);
+		if($.trim(node.text()) == optValue) {
+			alert("输入的分类已经存在！");
+			return;
+		}
+	}
+	
+	// create node
+	var s = '' +
+		'<div class="layui-form-item" style="cursor:pointer;padding:2px;" onclick="onCategoryClick(\'' + optValue + '\');">' +
+		'	<label class="layui-form-label">' + optValue + '</label>' +
+		'</div>';
+
+	$('#divCat').append(s);
+	
+	onCategoryClick(optValue);
+}
+</script>
+</head>
+
+<div class="layui-fluid">
+	<form id="fAdd" class="layui-form" action="#" onsubmit="return false" method="post">
+		<input type="hidden" id="dialogId" name="dialogId" value="${parameter.dialogId}"/>
+		<div class="layui-card">
+			<div class="layui-card-header">选择分类</div>
+			<div id="divCat" class="layui-card-body" style="padding: 15px;">
+  <div style="margin-left:5px;margin-top:5px;">
+<% if(has(categoryList) && categoryList != null){ for(i in categoryList) {%>
+				<div class="layui-form-item" style="cursor:pointer;padding:2px;" onclick="onCategoryClick('${@team.bangbang.common.utility.LogicUtility.getQuotedString(i)}');">
+					<label class="layui-form-label">${@team.bangbang.common.utility.LogicUtility.getHTMLString(i)}</label>
+				</div>
+<%}}%>
+			</div>
+		</div>
+		
+		<div class="layui-form-item layui-layout-admin">
+			<div class="layui-input-block">
+				<div class="layui-footer" style="left: 0;">
+					<button class="layui-btn" onclick="addCategory();">新增分类</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+</body>
+</html>

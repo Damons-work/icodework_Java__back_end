@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.tool.mapper.ProjectMapper">
+    <!-- 查询工程信息 -->
+    <!-- 查询单条工程信息 -->
+    <select id="getObject" resultType="cn.js.icode.tool.data.Project">
+        SELECT
+        ProjectId, ProjectName, Remark, CreateTime, CreatorId
+        FROM tool_project_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ProjectId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.projectName != null and where.projectName != ''">
+                        AND ProjectName = #{where.projectName}
+                    </if>
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark = #{where.remark}
+                    </if>
+                    <if test="where != null and where.createTime != null">
+						<![CDATA[ AND CreateTime = DATE_FORMAT(#{where.createTime}, '%Y-%m-%d') ]]>
+                    </if>
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY ProjectId DESC limit 0, 1
+    </select>
+    <!-- 查询多条工程信息 -->
+    <select id="list" resultType="cn.js.icode.tool.data.Project">
+        SELECT
+        ProjectId, ProjectName, Remark, CreateTime, CreatorId
+        FROM tool_project_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ProjectId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.projectName != null and where.projectName != ''">
+                        AND ProjectName like concat('%', #{where.projectName}, '%')
+                    </if>
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark like concat('%', #{where.remark}, '%')
+                    </if>
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY ProjectId DESC
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM tool_project_base
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ProjectId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.projectName != null and where.projectName != ''">
+                        AND ProjectName like concat('%', #{where.projectName}, '%')
+                    </if>
+                    <if test="where != null and where.remark != null and where.remark != ''">
+                        AND Remark like concat('%', #{where.remark}, '%')
+                    </if>
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO tool_project_base(ProjectId, ProjectName, Remark, CreateTime, CreatorId)
+        VALUES (
+        #{data.id},
+		#{data.projectName},
+		#{data.remark},
+		#{data.createTime},
+		#{data.creatorId}
+        )
+    </insert>
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE tool_project_base
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="data.id != null">
+                ProjectId = #{data.id},
+            </if>
+			<if test="data.projectName != null">
+				ProjectName = #{data.projectName},
+			</if>
+			<if test="data.remark != null">
+				Remark = #{data.remark},
+			</if>
+            <if test="data.createTime != null">
+                CreateTime = #{data.createTime},
+            </if>
+			<if test="data.creatorId != null">
+				CreatorId = #{data.creatorId},
+			</if>
+        </trim>
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ProjectId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.projectName != null">
+                        AND ProjectName = #{where.projectName}
+                    </if>
+                    <if test="where != null and where.remark != null">
+                        AND Remark = #{where.remark}
+                    </if>
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+    <!-- 删除工程信息 -->
+    <delete id="delete">
+        DELETE FROM tool_project_base
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <choose>
+                <when test="where != null and where.id != null">
+                    ProjectId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.projectName != null">
+                        AND ProjectName = #{where.projectName}
+                    </if>
+                    <if test="where != null and where.remark != null">
+                        AND Remark = #{where.remark}
+                    </if>
+                    <if test="where != null and where.createTimeTop != null">
+						<![CDATA[ AND CreateTime <= DATE_FORMAT(#{where.createTimeTop}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.createTimeBottom != null">
+						<![CDATA[ AND CreateTime >= DATE_FORMAT(#{where.createTimeBottom}, '%Y-%m-%d %H:%i') ]]>
+                    </if>
+                    <if test="where != null and where.creatorId != null">
+                        AND CreatorId = #{where.creatorId}
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>

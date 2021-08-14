@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--
+*******************************************************************************
+*
+* ！！！！除非设计、指导人员有特别说明，否则此处不得随意增加、修改、删除！！！！
+* －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+*		
+*******************************************************************************
+-->
+<mapper namespace="cn.js.icode.basis.mapper.OrganizationMapper">
+    <!-- 查询组织机构信息 -->
+    <!-- 查询单条组织机构信息 -->
+    <select id="getObject" resultType="cn.js.icode.basis.data.Organization">
+        SELECT
+        OrganizationId, ParentId, TypeFlag, OrganizationCode, OrganizationName, BriefName, ActiveFlag
+        FROM basis_organization_base
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <choose>
+                <when test="where != null and where.id != null">
+                    OrganizationId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="where != null and where.organizationCode != null and where.organizationCode != ''">
+                        AND OrganizationCode = #{where.organizationCode}
+                    </if>
+                    <if test="where != null and where.organizationName != null and where.organizationName != ''">
+                        AND OrganizationName = #{where.organizationName}
+                    </if>
+                    <if test="where != null and where.briefName != null and where.briefName != ''">
+                        AND BriefName = #{where.briefName}
+                    </if>
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY OrganizationCode limit 0, 1
+    </select>
+    <!-- 查询多条组织机构信息 -->
+    <select id="list" resultType="cn.js.icode.basis.data.Organization">
+        SELECT
+        OrganizationId, ParentId, TypeFlag, OrganizationCode, OrganizationName, BriefName, ActiveFlag
+        FROM basis_organization_base
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <choose>
+                <when test="where != null and where.id != null">
+                    OrganizationId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="where != null and where.organizationCode != null and where.organizationCode != ''">
+                        AND OrganizationCode like concat('%', #{where.organizationCode}, '%')
+                    </if>
+                    <if test="where != null and where.organizationName != null and where.organizationName != ''">
+                        AND OrganizationName like concat('%', #{where.organizationName}, '%')
+                    </if>
+                    <if test="where != null and where.briefName != null and where.briefName != ''">
+                        AND BriefName like concat('%', #{where.briefName}, '%')
+                    </if>
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+        ORDER BY OrganizationCode
+        <if test="pagination != null">
+        limit #{pagination.startPosition}, #{pagination.maxResults}
+        </if>
+    </select>
+	<!-- 查询符合条件的记录数量 -->
+    <select id="count" resultType="int">
+        SELECT
+        count(1)
+        FROM basis_organization_base
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <choose>
+                <when test="where != null and where.id != null">
+                    OrganizationId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="where != null and where.organizationCode != null and where.organizationCode != ''">
+                        AND OrganizationCode like concat('%', #{where.organizationCode}, '%')
+                    </if>
+                    <if test="where != null and where.organizationName != null and where.organizationName != ''">
+                        AND OrganizationName like concat('%', #{where.organizationName}, '%')
+                    </if>
+                    <if test="where != null and where.briefName != null and where.briefName != ''">
+                        AND BriefName like concat('%', #{where.briefName}, '%')
+                    </if>
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+    <!-- 新增会员 -->
+    <insert id="insert">
+        INSERT INTO basis_organization_base(OrganizationId, ParentId, TypeFlag, OrganizationCode, OrganizationName, BriefName, ActiveFlag, UpdateTime)
+        VALUES (
+        #{data.id},
+		#{data.parentId},
+		#{data.typeFlag},
+		#{data.organizationCode},
+		#{data.organizationName},
+		#{data.briefName},
+		<if test="data.activeFlag == null">null</if>
+		<if test="data.activeFlag != null and data.activeFlag">1</if>
+		<if test="data.activeFlag != null and !data.activeFlag">0</if>,
+		now()
+        )
+    </insert>
+    <!-- 修改会员 -->
+    <update id="update">
+        UPDATE basis_organization_base
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="data.id != null">
+                OrganizationId = #{data.id},
+            </if>
+			<if test="data.parentId != null">
+				ParentId = #{data.parentId},
+			</if>
+			<if test="data.typeFlag != null">
+				TypeFlag = #{data.typeFlag},
+			</if>
+			<if test="data.organizationCode != null">
+				OrganizationCode = #{data.organizationCode},
+			</if>
+			<if test="data.organizationName != null">
+				OrganizationName = #{data.organizationName},
+			</if>
+			<if test="data.briefName != null">
+				BriefName = #{data.briefName},
+			</if>
+			<if test="data.activeFlag != null and data.activeFlag">
+				ActiveFlag = 1,
+			</if>
+			<if test="data.activeFlag != null and !data.activeFlag">
+				ActiveFlag = 0,
+			</if>
+	
+			UpdateTime = now()
+        </trim>
+        <trim prefix="where" prefixOverrides="AND">
+            <choose>
+                <when test="where != null and where.id != null">
+                    OrganizationId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="where != null and where.organizationCode != null">
+                        AND OrganizationCode = #{where.organizationCode}
+                    </if>
+                    <if test="where != null and where.organizationName != null">
+                        AND OrganizationName = #{where.organizationName}
+                    </if>
+                    <if test="where != null and where.briefName != null">
+                        AND BriefName = #{where.briefName}
+                    </if>
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </update>
+    <!-- 删除组织机构信息 -->
+    <delete id="delete">
+        DELETE FROM basis_organization_base
+        <trim prefix="where" prefixOverrides="AND">
+            <choose>
+                <when test="where != null and where.id != null">
+                    OrganizationId = #{where.id}
+                </when>
+                <otherwise>
+                    <if test="where != null and where.parentId != null">
+                        AND ParentId = #{where.parentId}
+                    </if>
+                    <if test="where != null and where.typeFlag != null">
+                        AND TypeFlag = #{where.typeFlag}
+                    </if>
+                    <if test="where != null and where.organizationCode != null">
+                        AND OrganizationCode = #{where.organizationCode}
+                    </if>
+                    <if test="where != null and where.organizationName != null">
+                        AND OrganizationName = #{where.organizationName}
+                    </if>
+                    <if test="where != null and where.briefName != null">
+                        AND BriefName = #{where.briefName}
+                    </if>
+                    <if test="where != null and where.activeFlag != null and where.activeFlag">
+                        AND ActiveFlag = 1
+                    </if>
+                    <if test="where != null and where.activeFlag != null and !where.activeFlag">
+                        AND ActiveFlag = 0
+                    </if>
+                    <if test="appendix != null and appendix != ''">
+                        AND ${appendix}
+                    </if>
+                </otherwise>
+            </choose>
+        </trim>
+    </delete>
+</mapper>
